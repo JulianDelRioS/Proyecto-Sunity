@@ -1,0 +1,10 @@
+Para poder correr el sistema 
+Backend:
+Proyecto-Sunity> cd backend
+Proyecto-Sunity\backend> .venv\Scripts\activate
+(.venv) Proyecto-Sunity\backend> uvicorn main:app --reload --port 8000
+
+Frontend:
+Proyecto-Sunity> cd frontend
+Proyecto-Sunity\frontend> cd SunityF
+Proyecto-Sunity\frontend\SunityF> ionic serve
