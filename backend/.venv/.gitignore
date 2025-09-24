@@ -1,0 +1,17 @@
+# Backend Python
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+
+# Frontend Node/Ionic
+frontend/node_modules/
+frontend/www/
+frontend/build/
+
+# Logs y temporales
+*.log
+*.sqlite3
+
+# VS Code
+.vscode/

@@ -1,0 +1,7 @@
+{
+  "name": "SunityF",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

@@ -1,0 +1,41 @@
+/* Importa la fuente Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+ion-content {
+  --background: #0099CC; /* Aquí puedes poner el color que quieras */
+}
+
+
+
+.home-center {
+  display: flex;            /* activa flexbox */
+  flex-direction: column;   /* apila elementos verticalmente */
+  justify-content: center;  /* centra verticalmente */
+  align-items: center;      /* centra horizontalmente */
+  text-align: center;
+  height: 100%;             /* asegura que ocupe todo el contenedor padre */
+}
+
+h1 {
+  font-family: 'Poppins', sans-serif;
+  color: #FFFF;
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;  /* centra verticalmente con el logo */
+}
+
+.logo-icon {
+  width: clamp(30px, 4vw, 50px); /* mínimo 30px, ideal 4% del ancho, máximo 50px */
+  height: auto;                  /* mantiene proporción */
+  margin-left: 0.5em;
+}
+
+
+
+#g_id_signin {
+  display: block;       /* asegura que se comporte como bloque */
+  margin: 1rem auto 0;  /* centra horizontalmente y separa del título */
+  max-width: 250px;     /* ancho máximo */
+  width: 100%;          /* ocupa todo el ancho disponible hasta el máximo */
+}
+
