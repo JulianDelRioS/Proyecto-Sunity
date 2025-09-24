@@ -7,14 +7,13 @@ from jose import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-
+from fastapi import Cookie
 # Cargar variables de entorno desde .env
 load_dotenv()
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALG = "HS256"
-print(GOOGLE_CLIENT_ID)
 app = FastAPI()
 
 # Permitir CORS para que Ionic pueda llamar al backend
@@ -64,7 +63,22 @@ def auth_google(payload: TokenIn, response: Response):
 
     return {"ok": True, "token": token, "user": {"id": user_id, "email": email, "name": name}}
 
-# Ruta de prueba opcional
-@app.get("/")
-def read_root():
-    return {"message": "Backend Sunity listo para Google Login"}
+
+# Ruta para obtener los datos del usuario a partir de la cookie
+@app.get("/profile")
+def get_profile(access_token: str = Cookie(None)):
+    if not access_token:
+        raise HTTPException(status_code=401, detail="No autorizado")
+    try:
+        payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    return {"user": {"id": payload["sub"], "email": payload["email"], "name": payload["name"]}}
+
+
+
+#Cerrar Sesion borrando la cookie
+@app.post("/logout")
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"ok": True, "message": "Sesión cerrada"}
