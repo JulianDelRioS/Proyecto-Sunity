@@ -1,0 +1,32 @@
+.home-content {
+  display: flex;
+  justify-content: center; /* centra horizontalmente el contenedor */
+  align-items: center;     /* centra verticalmente */
+  height: 100%;
+}
+
+.white-container {
+  width: 100%;            /* ocupa todo el ancho horizontal */
+  height: 80%;            /* 80% del alto del viewport */
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;          /* opcional: centrar contenido interno */
+  justify-content: center;
+  align-items: center;
+}
+
+.title-menu-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* h1 a la izquierda, menú a la derecha */
+  width: 100%;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  margin-left: 10px;
+}
+
+

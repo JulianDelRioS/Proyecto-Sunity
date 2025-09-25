@@ -1,0 +1,178 @@
+.hamburguesa-content {
+  --width: 300px;
+  --background: #0099CC;
+}
+
+.hamburguesa-header {
+  --background: transparent;
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hamburguesa-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hamburguesa-user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hamburguesa-user-details {
+  flex: 1;
+}
+
+.hamburguesa-user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.hamburguesa-user-email {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 2px;
+}
+
+.hamburguesa-content-inner {
+  --background: transparent;
+}
+
+.hamburguesa-list {
+  background: transparent;
+  padding: 16px 0;
+}
+
+.hamburguesa-item {
+  --background: transparent;
+  --border-color: transparent;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 56px;
+  margin: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.hamburguesa-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(4px);
+}
+
+.hamburguesa-item:active {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.hamburguesa-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  transition: all 0.3s ease;
+}
+
+.hamburguesa-profile-icon {
+  color: #4fc3f7;
+}
+
+.hamburguesa-friends-icon {
+  color: #4db6ac;
+}
+
+.hamburguesa-info-icon {
+  color: #ffb74d;
+}
+
+.hamburguesa-logout-icon {
+  color: #ff6b6b;
+}
+
+.hamburguesa-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+}
+
+.hamburguesa-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 16px 16px;
+}
+
+/* Hover individual */
+.hamburguesa-profile-item:hover .hamburguesa-profile-icon {
+  color: #29b6f6;
+  transform: scale(1.1);
+}
+
+.hamburguesa-friends-item:hover .hamburguesa-friends-icon {
+  color: #26a69a;
+  transform: scale(1.1);
+}
+
+.hamburguesa-info-item:hover .hamburguesa-info-icon {
+  color: #ffa726;
+  transform: scale(1.1);
+}
+
+.hamburguesa-logout-item {
+  margin-top: 8px;
+}
+
+.hamburguesa-logout-item:hover {
+  background: rgba(255, 107, 107, 0.2) !important;
+}
+
+.hamburguesa-logout-item:hover .hamburguesa-logout-icon {
+  color: #ff5252;
+  transform: scale(1.1);
+}
+
+/* Animación */
+@keyframes hamburguesa-slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hamburguesa-item {
+  animation: hamburguesa-slideIn 0.3s ease forwards;
+}
+
+.hamburguesa-item:nth-child(1) { animation-delay: 0.1s; }
+.hamburguesa-item:nth-child(2) { animation-delay: 0.2s; }
+.hamburguesa-item:nth-child(3) { animation-delay: 0.3s; }
+.hamburguesa-logout-item { animation-delay: 0.4s; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .hamburguesa-content {
+    --width: 280px;
+  }
+  
+  .hamburguesa-user-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .hamburguesa-user-name {
+    font-size: 16px;
+  }
+}

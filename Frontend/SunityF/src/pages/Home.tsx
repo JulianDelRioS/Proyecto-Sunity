@@ -1,5 +1,5 @@
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import './Home.css';
+import './Styles/Home.css';
 import GoogleLogin from "../components/GoogleLogin";
 import Logo from "../components/Imagenes/logo.png";
 
