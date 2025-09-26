@@ -28,4 +28,5 @@ export const getProfile = async () => {
     console.error("Error obteniendo perfil:", err);
     throw err;
   }
+
 };
