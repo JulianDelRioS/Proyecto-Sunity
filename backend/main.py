@@ -35,37 +35,42 @@ class TokenIn(BaseModel):
 @app.post("/auth/google")
 def auth_google(payload: TokenIn, response: Response):
     try:
-        # Verificar id_token con Google
         idinfo = google_id_token.verify_oauth2_token(
             payload.id_token,
             google_requests.Request(),
             GOOGLE_CLIENT_ID
         )
-        # Validar issuer
         if idinfo.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
             raise ValueError("Issuer inválido")
     except ValueError:
         raise HTTPException(status_code=400, detail="Token de Google inválido")
 
-    # Extraer datos del usuario
     user_id = idinfo["sub"]
     email = idinfo.get("email")
     name = idinfo.get("name")
-    foto_perfil = idinfo.get("picture")  # opcional, si quieres guardar la foto
+    foto_perfil = idinfo.get("picture")
 
-    # Guardar usuario en la base de datos
+    first_login = False
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute(
-            """
-            INSERT INTO usuarios (google_id, email, nombre, foto_perfil)
-            VALUES (%s, %s, %s, %s)
-            ON CONFLICT (google_id) DO NOTHING
-            """,
-            (user_id, email, name, foto_perfil)
-        )
-        conn.commit()
+
+        # Usar google_id como identificador, no id
+        cur.execute("SELECT google_id FROM usuarios WHERE google_id = %s", (user_id,))
+        existe = cur.fetchone()
+
+        if not existe:
+            # No existe → insertar
+            cur.execute(
+                """
+                INSERT INTO usuarios (google_id, email, nombre, foto_perfil)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (user_id, email, name, foto_perfil)
+            )
+            conn.commit()
+            first_login = True  # 🚩 Es el primer login
+
         cur.close()
         conn.close()
     except Exception as e:
@@ -82,13 +87,14 @@ def auth_google(payload: TokenIn, response: Response):
     }
     token = jwt.encode(payload_jwt, JWT_SECRET, algorithm=JWT_ALG)
 
-    # 🔹 Imprimir el token en consola
-    print("JWT generado:", token)
-
-    # Opcional: enviar cookie
     response.set_cookie("access_token", token, httponly=True, secure=False, samesite="lax")
 
-    return {"ok": True, "token": token, "user": {"id": user_id, "email": email, "name": name, "picture": foto_perfil}}
+    return {
+        "ok": True,
+        "firstLogin": first_login,
+        "token": token,
+        "user": {"id": user_id, "email": email, "name": name, "picture": foto_perfil}
+    }
 
 # Ruta para obtener los datos del usuario a partir de la cookie
 @app.get("/profile")

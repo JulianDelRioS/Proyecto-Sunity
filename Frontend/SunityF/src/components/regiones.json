@@ -1,0 +1,18 @@
+{
+  "Región de Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+  "Región de Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+  "Región de Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "María Elena"],
+  "Región de Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+  "Región de Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+  "Región de Valparaíso": ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "Concón", "San Antonio", "Cartagena", "El Tabo", "El Quisco", "Santo Domingo", "Los Andes", "San Felipe", "Santa María", "Puchuncaví", "Quillota", "La Calera", "Nogales", "Hijuelas", "La Ligua", "Cabildo", "Petorca", "Zapallar", "Papudo", "Isla de Pascua"],
+  "Región Metropolitana": ["Santiago", "Providencia", "Ñuñoa", "Las Condes", "Vitacura", "La Reina", "Peñalolén", "Macul", "Maipú", "Puente Alto", "San Bernardo", "La Florida", "Ñuñoa"],
+  "Región del Libertador General Bernardo O'Higgins": ["Rancagua", "San Fernando", "Rengo", "Machalí", "Mostazal", "Graneros", "San Vicente", "Pichidegua", "Chimbarongo", "Lolol", "Santa Cruz"],
+  "Región del Maule": ["Talca", "Curicó", "Linares", "Maule", "Cauquenes", "San Javier", "Constitución", "Pelarco", "Colbún"],
+  "Región de Ñuble": ["Chillán", "Chillán Viejo", "Bulnes", "Quirihue", "Cobquecura", "San Carlos"],
+  "Región del Biobío": ["Concepción", "Talcahuano", "Hualpén", "Coronel", "Lota", "San Pedro de la Paz", "Chiguayante", "Los Ángeles", "Tucapel"],
+  "Región de La Araucanía": ["Temuco", "Villarrica", "Angol", "Pucón", "Loncoche", "Carahue"],
+  "Región de Los Ríos": ["Valdivia", "La Unión", "Río Bueno", "Mariquina", "Lanco", "Paillaco"],
+  "Región de Los Lagos": ["Puerto Montt", "Puerto Varas", "Osorno", "Castro", "Ancud", "Chaitén", "Quellón"],
+  "Región de Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Aysén", "Cisnes", "Guaitecas", "Río Ibáñez", "Chile Chico"],
+  "Región de Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Cabo de Hornos", "Laguna Blanca"]
+}

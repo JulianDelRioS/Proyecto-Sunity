@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom"; // <-- useHistory para v5
+import { useHistory } from "react-router-dom"; // <-- useHistory para React Router v5
 
 const GOOGLE_CLIENT_ID =
   "542135659829-lokuuh6bdejhk6sass3bvglk355s65i8.apps.googleusercontent.com";
@@ -38,7 +38,7 @@ export default function GoogleLogin() {
     };
     document.body.appendChild(script);
 
-    checkSession(); // Verificar sesión activa
+    checkSession(); // Verificar sesión activa al cargar
 
     return () => {
       const btn = document.getElementById("g_id_signin");
@@ -62,13 +62,18 @@ export default function GoogleLogin() {
 
       if (data.ok) {
         setUser(data.user);
-        history.push("/principal"); // <-- redirige después del login
+
+        // 🚩 Si es la primera vez lo mandamos a /MiPerfil
+        if (data.firstLogin) {
+          history.push("/MiPerfil");
+        } else {
+          history.push("/principal");
+        }
       }
     } catch (err) {
       console.error("Error enviando token al backend:", err);
     }
   };
-  
 
   const checkSession = async () => {
     try {
@@ -79,7 +84,9 @@ export default function GoogleLogin() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        history.push("/principal"); // <-- redirige si ya hay sesión
+
+        // Si ya tiene sesión, va directo a principal
+        history.push("/principal");
       }
     } catch (err) {
       console.log("No hay sesión activa");

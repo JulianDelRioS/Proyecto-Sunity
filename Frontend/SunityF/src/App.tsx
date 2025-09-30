@@ -3,7 +3,7 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Principal from './pages/Principal';
-
+import MiPerfil from './pages/MiPerfil';
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -34,6 +34,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+
 setupIonicReact();
 
 const App: React.FC = () => (
@@ -48,6 +49,9 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/Principal">
           <Principal />
+        </Route>
+        <Route exact path="/MiPerfil">
+          <MiPerfil />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

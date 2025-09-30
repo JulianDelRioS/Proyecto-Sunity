@@ -9,3 +9,16 @@ Frontend:
 Proyecto-Sunity> cd frontend
 Proyecto-Sunity\frontend> cd SunityF
 Proyecto-Sunity\frontend\SunityF> ionic serve
+
+
+
+base de datos tablas :
+
+
+CREATE TABLE usuarios (
+    google_id VARCHAR(255) PRIMARY KEY,   -- PK: Google ID único e inmutable
+    email VARCHAR(150) UNIQUE NOT NULL,   -- correo del usuario
+    nombre VARCHAR(100) NOT NULL,         -- nombre completo del usuario
+    foto_perfil TEXT,                     -- URL de la foto de perfil (opcional)
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
