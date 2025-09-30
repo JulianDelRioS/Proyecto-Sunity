@@ -28,5 +28,26 @@ export const getProfile = async () => {
     console.error("Error obteniendo perfil:", err);
     throw err;
   }
+};
 
+// Nueva función para actualizar el perfil
+export const updateProfile = async (data: { telefono: string; region: string; comuna: string }) => {
+  try {
+    const res = await fetch("http://localhost:8000/profile/update", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
+    if (!res.ok || !result.ok) {
+      throw new Error(result.detail || "Error actualizando perfil");
+    }
+    return result;
+  } catch (err) {
+    console.error("Error actualizando perfil:", err);
+    throw err;
+  }
 };

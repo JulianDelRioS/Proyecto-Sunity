@@ -17,8 +17,11 @@ base de datos tablas :
 
 CREATE TABLE usuarios (
     google_id VARCHAR(255) PRIMARY KEY,   -- PK: Google ID único e inmutable
-    email VARCHAR(150) UNIQUE NOT NULL,   -- correo del usuario
-    nombre VARCHAR(100) NOT NULL,         -- nombre completo del usuario
+    email VARCHAR(150) UNIQUE NOT NULL,   -- Correo del usuario
+    nombre VARCHAR(100) NOT NULL,         -- Nombre completo del usuario
     foto_perfil TEXT,                     -- URL de la foto de perfil (opcional)
+    telefono CHAR(9),                     -- Número de teléfono chileno (9 dígitos)
+    region VARCHAR(100),                  -- Región del usuario
+    comuna VARCHAR(100),                  -- Comuna del usuario
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

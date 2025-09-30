@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import os
 from fastapi import Cookie
 from bd import get_connection
-
+from fastapi import UploadFile, File, Form
 # Cargar variables de entorno desde .env
 load_dotenv()
 
@@ -112,3 +112,47 @@ def get_profile(access_token: str = Cookie(None)):
 def logout(response: Response):
     response.delete_cookie("access_token")
     return {"ok": True, "message": "Sesión cerrada"}
+
+
+
+
+
+class UpdateProfile(BaseModel):
+    comuna: str
+    region: str
+    telefono: str
+
+
+
+@app.post("/profile/update")
+def update_profile(data: UpdateProfile, access_token: str = Cookie(None)):
+    if not access_token:
+        raise HTTPException(status_code=401, detail="No autorizado")
+    
+    try:
+        payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = payload["sub"]
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            UPDATE usuarios
+            SET comuna = %s,
+                region = %s,
+                telefono = %s
+            WHERE google_id = %s
+            """,
+            (data.comuna, data.region, data.telefono, user_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print("Error actualizando usuario:", e)
+        raise HTTPException(status_code=500, detail="Error interno actualizando usuario")
+    
+    return {"ok": True, "message": "Perfil actualizado"}
