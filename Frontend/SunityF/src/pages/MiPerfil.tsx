@@ -12,13 +12,14 @@ import {
   IonAvatar,
   IonIcon
 } from '@ionic/react';
-import { personOutline, mailOutline, callOutline, locationOutline, saveOutline } from 'ionicons/icons';
+import { personOutline, mailOutline, callOutline, locationOutline, saveOutline, cameraOutline } from 'ionicons/icons';
 import './Styles/Home.css';
 import './Styles/Principal.css';
-import Logo from "../components/Imagenes/logo.png";
+import './Styles/MiPerfil.css';
+
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getProfile, updateProfile } from '../components/funciones';
+import { getProfile, updateProfile, uploadProfilePhoto  } from '../components/funciones';
 import regionesJson from '../components/regiones.json';
 
 interface RegionesData {
@@ -30,7 +31,12 @@ const regionesData: RegionesData = regionesJson;
 const MiPerfil: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState<any>(null);
-  const [extraData, setExtraData] = useState({ telefono: "", region: "", comuna: "" });
+  const [extraData, setExtraData] = useState({ 
+    telefono: "", 
+    region: "", 
+    comuna: "",
+    foto: "" // Agregar campo para la foto
+  });
 
   const regiones = Object.keys(regionesData);
 
@@ -45,7 +51,8 @@ const MiPerfil: React.FC = () => {
         setExtraData({
           telefono: data.user.telefono || "",
           region: data.user.region || "",
-          comuna: data.user.comuna || ""
+          comuna: data.user.comuna || "",
+          foto: data.user.foto || ""
         });
       } catch (err) {
         history.push("/home");
@@ -60,6 +67,29 @@ const MiPerfil: React.FC = () => {
     setExtraData({ ...extraData, [name]: value });
   };
 
+  // Manejar subida de foto
+const handlePhotoUpload = async (event: any) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    // Creamos FormData para enviar el archivo
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Llamamos al backend
+    const data = await uploadProfilePhoto(formData); // espera que devuelva { ok, url, message }
+
+    // Actualizamos la foto en el estado para previsualizar
+    setExtraData({ ...extraData, foto: data.url });
+
+    alert("Foto subida exitosamente");
+
+  } catch (err: any) {
+    console.error("Error subiendo foto:", err);
+    alert("Error subiendo la foto: " + (err.message || err));
+  }
+};
   // Guardar datos en backend
   const handleSave = async () => {
     try {
@@ -80,20 +110,40 @@ const MiPerfil: React.FC = () => {
       <IonHeader></IonHeader>
       <IonContent id="main-content">
         <div className="home-center">
-          <div className="title-menu-container">
-            <h1>
-              Mi Perfil
-              <img src={Logo} alt="Logo" className="logo-icon" />
-            </h1>
-          </div>
 
-          <div className="white-container">
 
-            {/* Foto de perfil */}
-            <div className="avatar-section">
-              <IonAvatar className="profile-avatar">
-                <img src={user.picture || "/default-avatar.png"} alt="Foto de perfil" />
-              </IonAvatar>
+          <div className="perfil-container">
+
+            {/* Sección de Foto de Perfil */}
+            <div className="photo-section">
+              <div className="avatar-container">
+          <IonAvatar className="profile-avatar">
+            {extraData.foto ? (
+              <img src={`http://localhost:8000${extraData.foto}`} alt="Foto de perfil" />
+            ) : (
+              <IonIcon icon={personOutline} className="avatar-placeholder" />
+            )}
+          </IonAvatar>
+                
+                {/* Input oculto para subir archivos */}
+                <input 
+                  type="file" 
+                  id="photo-upload"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  style={{ display: 'none' }}
+                />
+                
+                {/* Botón para subir foto */}
+                <IonButton 
+                  fill="clear" 
+                  className="photo-upload-button"
+                  onClick={() => document.getElementById('photo-upload')?.click()}
+                >
+                  <IonIcon icon={cameraOutline} slot="start" />
+                  Subir Foto
+                </IonButton>
+              </div>
             </div>
 
             {/* Campos del formulario */}

@@ -1,0 +1,277 @@
+/* --- Contenedor principal --- */
+.home-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* --- Contenedor del perfil --- */
+.perfil-container {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.15),
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* --- Foto de perfil --- */
+.photo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border: 3px solid #4f46e5;
+  box-shadow: 
+    0 4px 15px rgba(79, 70, 229, 0.3),
+    0 2px 4px rgba(79, 70, 229, 0.1);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  border-color: #6366f1;
+  box-shadow: 
+    0 6px 20px rgba(79, 70, 229, 0.4),
+    0 4px 8px rgba(79, 70, 229, 0.15);
+  transform: translateY(-2px);
+}
+
+.avatar-placeholder {
+  font-size: 60px;
+  color: #9ca3af;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 50%;
+}
+
+.photo-upload-button {
+  margin-top: 12px;
+  font-size: 14px;
+  --background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  --color: white;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.photo-upload-button:hover {
+  --background: linear-gradient(135deg, #4338ca 0%, #5855eb 100%);
+  --box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
+  transform: translateY(-1px);
+}
+
+/* --- Campos del formulario --- */
+.form-fields-vertical {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.category-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  margin-left: 4px;
+}
+
+.field-item {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.field-item:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 
+    0 0 0 3px rgba(79, 70, 229, 0.1),
+    0 2px 6px rgba(79, 70, 229, 0.1);
+  background: #fafbff;
+}
+
+.field-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  color: #4f46e5;
+  transition: color 0.3s ease;
+}
+
+.field-item:focus-within .field-icon {
+  color: #6366f1;
+}
+
+.field-input, .field-select {
+  width: 100%;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --color: white;
+  font-size: 0.95rem;
+}
+
+.field-input::part(native), .field-select::part(container) {
+  background: transparent;
+}
+
+/* Estilos para campos de solo lectura */
+.field-item[readonly] {
+  background: #f8fafc;
+  border-color: #d1d5db;
+  opacity: 0.8;
+  
+}
+
+.field-item[readonly] .field-icon {
+  color: #6b7280;
+}
+
+/* Placeholders */
+.field-input::part(placeholder), .field-select::part(placeholder) {
+  --color: #white;
+  opacity: 0.8;
+}
+
+/* --- Botón de guardar --- */
+.save-button {
+  margin-top: 25px;
+  font-size: 16px;
+  --background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --color: white;
+  --border-radius: 14px;
+  --box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+  font-weight: 600;
+  height: 50px;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  --background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.save-button:active {
+  transform: translateY(0);
+}
+
+/* Estados deshabilitados */
+.field-select:disabled {
+  opacity: 0.6;
+  background: #f3f4f6;
+}
+
+/* --- Ajustes para móviles (pantallas < 500px) --- */
+@media screen and (max-width: 500px) {
+  .home-center {
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .perfil-container {
+    padding: 20px;
+    max-width: 100%;
+    border-radius: 16px;
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.15),
+      0 3px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-width: 2.5px;
+  }
+
+  .avatar-placeholder {
+    font-size: 50px;
+  }
+
+  .photo-upload-button {
+    font-size: 12px;
+    padding: 6px 12px;
+    --border-radius: 10px;
+  }
+
+  .field-icon {
+    font-size: 18px;
+    margin-right: 10px;
+  }
+
+  .save-button {
+    font-size: 14px;
+    height: 46px;
+    --border-radius: 12px;
+  }
+
+  .form-fields-vertical {
+    gap: 15px;
+  }
+
+  .field-item {
+    padding: 0 12px;
+    border-radius: 10px;
+  }
+
+  .category-label {
+    font-size: 0.85rem;
+  }
+}
+
+/* Animaciones suaves */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.perfil-container {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Efectos de hover adicionales */
+.field-item:hover:not([readonly]) {
+  border-color: #c7d2fe;
+  background: #f8faff;
+}
+
+/* Mejora para los selects */
+.field-select::part(icon) {
+  color: #4f46e5;
+}
+
+/* Focus states mejorados */
+.field-input:focus, .field-select:focus {
+  outline: none;
+}

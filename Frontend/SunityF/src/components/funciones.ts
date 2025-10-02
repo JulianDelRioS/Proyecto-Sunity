@@ -50,4 +50,22 @@ export const updateProfile = async (data: { telefono: string; region: string; co
     console.error("Error actualizando perfil:", err);
     throw err;
   }
+}
+
+// funciones.ts
+export const uploadProfilePhoto = async (formData: FormData) => {
+  const response = await fetch("http://localhost:8000/profile/upload-photo", {
+    method: "POST",
+    body: formData,
+    credentials: "include", // importante para enviar cookies
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || "Error subiendo foto");
+  }
+
+  return await response.json(); // { ok, message, url }
 };
+
+;

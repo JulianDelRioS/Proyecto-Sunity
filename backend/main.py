@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Cookie, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.oauth2 import id_token as google_id_token  # type: ignore
@@ -7,9 +7,11 @@ from jose import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-from fastapi import Cookie
 from bd import get_connection
-from fastapi import UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
+import shutil
+
+
 # Cargar variables de entorno desde .env
 load_dotenv()
 
@@ -48,7 +50,6 @@ def auth_google(payload: TokenIn, response: Response):
     user_id = idinfo["sub"]
     email = idinfo.get("email")
     name = idinfo.get("name")
-    foto_perfil = idinfo.get("picture")
 
     first_login = False
     try:
@@ -60,13 +61,13 @@ def auth_google(payload: TokenIn, response: Response):
         existe = cur.fetchone()
 
         if not existe:
-            # No existe → insertar
+            # No existe → insertar (sin foto_perfil)
             cur.execute(
                 """
-                INSERT INTO usuarios (google_id, email, nombre, foto_perfil)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO usuarios (google_id, email, nombre)
+                VALUES (%s, %s, %s)
                 """,
-                (user_id, email, name, foto_perfil)
+                (user_id, email, name)
             )
             conn.commit()
             first_login = True  # 🚩 Es el primer login
@@ -77,12 +78,11 @@ def auth_google(payload: TokenIn, response: Response):
         print("Error guardando usuario:", e)
         raise HTTPException(status_code=500, detail="Error interno guardando usuario")
 
-    # Crear JWT propio
+    # Crear JWT propio (sin picture)
     payload_jwt = {
         "sub": user_id,
         "email": email,
         "name": name,
-        "picture": foto_perfil,
         "exp": datetime.utcnow() + timedelta(days=7)
     }
     token = jwt.encode(payload_jwt, JWT_SECRET, algorithm=JWT_ALG)
@@ -93,7 +93,7 @@ def auth_google(payload: TokenIn, response: Response):
         "ok": True,
         "firstLogin": first_login,
         "token": token,
-        "user": {"id": user_id, "email": email, "name": name, "picture": foto_perfil}
+        "user": {"id": user_id, "email": email, "name": name}
     }
 
 # Ruta para obtener los datos del usuario a partir de la cookie
@@ -105,7 +105,7 @@ def get_profile(access_token: str = Cookie(None)):
         payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
     except Exception:
         raise HTTPException(status_code=401, detail="Token inválido")
-    return {"user": {"id": payload["sub"], "email": payload["email"], "name": payload["name"], "picture": payload.get("picture")}}
+    return {"user": {"id": payload["sub"], "email": payload["email"], "name": payload["name"]}}
 
 # Cerrar sesión borrando la cookie
 @app.post("/logout")
@@ -114,14 +114,10 @@ def logout(response: Response):
     return {"ok": True, "message": "Sesión cerrada"}
 
 
-
-
-
 class UpdateProfile(BaseModel):
     comuna: str
     region: str
     telefono: str
-
 
 
 @app.post("/profile/update")
@@ -156,3 +152,58 @@ def update_profile(data: UpdateProfile, access_token: str = Cookie(None)):
         raise HTTPException(status_code=500, detail="Error interno actualizando usuario")
     
     return {"ok": True, "message": "Perfil actualizado"}
+
+
+
+# Montar la carpeta 'uploads' para servir archivos estáticos
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.post("/profile/upload-photo")
+def upload_profile_photo(file: UploadFile = File(...), access_token: str = Cookie(None)):
+    if not access_token:
+        raise HTTPException(status_code=401, detail="No autorizado")
+    
+    try:
+        payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = payload["sub"]
+        email = payload["email"]  # extraemos el correo para el nombre del archivo
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    
+    # Validar tipo de archivo
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(status_code=400, detail="Formato de imagen no soportado")
+    
+    # Crear nombre de archivo significativo con correo y fecha
+    fecha = datetime.now().strftime("%Y%m%d%H%M%S")  # AAAAMMDDHHMMSS
+    extension = file.filename.split(".")[-1]  # mantener extensión original
+    safe_email = email.replace("@", "_").replace(".", "_")  # caracteres seguros
+    filename = f"{safe_email}_{fecha}.{extension}"
+    
+    file_path = os.path.join("uploads", filename)
+    
+    # Guardar archivo
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # URL accesible desde el servidor
+    file_url = f"/uploads/{filename}"
+    
+    # Guardar URL en base de datos
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE usuarios SET foto_perfil = %s WHERE google_id = %s",
+            (file_url, user_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print("Error actualizando foto de perfil:", e)
+        raise HTTPException(status_code=500, detail="Error interno guardando la foto")
+    
+    return {"ok": True, "message": "Foto subida exitosamente", "url": file_url}
