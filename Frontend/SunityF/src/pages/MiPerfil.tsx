@@ -6,11 +6,10 @@ import {
   IonLabel,
   IonItem,
   IonButton,
-  IonMenuButton,
-  IonSelect,
-  IonSelectOption,
   IonAvatar,
-  IonIcon
+  IonIcon,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/react';
 import { personOutline, mailOutline, callOutline, locationOutline, saveOutline, cameraOutline } from 'ionicons/icons';
 import './Styles/Home.css';
@@ -19,113 +18,126 @@ import './Styles/MiPerfil.css';
 
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getProfile, updateProfile, uploadProfilePhoto  } from '../components/funciones';
 import regionesJson from '../components/regiones.json';
 
 interface RegionesData {
   [key: string]: string[];
 }
-
 const regionesData: RegionesData = regionesJson;
 
 const MiPerfil: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>({ name: '', email: '' });
   const [extraData, setExtraData] = useState({ 
     telefono: "", 
     region: "", 
     comuna: "",
-    foto: "" // Agregar campo para la foto
+    foto: "" 
   });
 
   const regiones = Object.keys(regionesData);
 
-  // Cargar perfil al iniciar
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const data = await getProfile();
-        setUser(data.user);
+  // Función para llamar API individual
+  const fetchField = async (endpoint: string) => {
+    const res = await fetch(`http://localhost:8000/profile/${endpoint}`, {
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error("Error cargando " + endpoint);
+    const data = await res.json();
 
-        // Si el backend devuelve datos adicionales, rellenarlos
-        setExtraData({
-          telefono: data.user.telefono || "",
-          region: data.user.region || "",
-          comuna: data.user.comuna || "",
-          foto: data.user.foto || ""
-        });
+    // Ajuste según lo que devuelve el backend
+    if (endpoint === "foto") return data.foto_perfil || "";
+    return data[endpoint] || "";
+  };
+
+  // Cargar todos los datos al iniciar
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        // Datos básicos (name, email)
+        const res = await fetch('http://localhost:8000/profile', { credentials: 'include' });
+        const basic = await res.json();
+        setUser(basic.user);
+
+        // Datos extra
+        const foto = await fetchField("foto");
+        const telefono = await fetchField("telefono");
+        const region = await fetchField("region");
+        const comuna = await fetchField("comuna");
+
+        setExtraData({ foto, telefono, region, comuna });
+
       } catch (err) {
+        console.error("Error cargando perfil:", err);
         history.push("/home");
       }
     };
-    checkSession();
+    loadProfile();
   }, [history]);
 
-  // Manejo de cambios en inputs y selects
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setExtraData({ ...extraData, [name]: value });
   };
 
-  // Manejar subida de foto
-const handlePhotoUpload = async (event: any) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  const handlePhotoUpload = async (event: any) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  try {
-    // Creamos FormData para enviar el archivo
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // Llamamos al backend
-    const data = await uploadProfilePhoto(formData); // espera que devuelva { ok, url, message }
-
-    // Actualizamos la foto en el estado para previsualizar
-    setExtraData({ ...extraData, foto: data.url });
-
-    alert("Foto subida exitosamente");
-
-  } catch (err: any) {
-    console.error("Error subiendo foto:", err);
-    alert("Error subiendo la foto: " + (err.message || err));
-  }
-};
-  // Guardar datos en backend
-  const handleSave = async () => {
     try {
-      const result = await updateProfile(extraData);
-      alert("Perfil actualizado correctamente");
-      history.push("/principal"); // redirige a principal
-    } catch (err: any) {
-      alert("Error actualizando perfil: " + err.message);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("http://localhost:8000/profile/upload-photo", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (data.ok) setExtraData({ ...extraData, foto: data.url });
+      alert(data.message);
+    } catch (err) {
+      console.error(err);
+      alert("Error subiendo la foto");
     }
   };
 
-  if (!user) {
-    return <IonPage><IonContent>Verificando sesión...</IonContent></IonPage>;
-  }
+  const handleSave = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/profile/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(extraData),
+        credentials: "include"
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert(data.message);
+        history.push("/principal");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error actualizando perfil");
+    }
+  };
 
   return (
     <IonPage>
       <IonHeader></IonHeader>
       <IonContent id="main-content">
         <div className="home-center">
-
-
           <div className="perfil-container">
 
-            {/* Sección de Foto de Perfil */}
+            {/* Foto de perfil */}
             <div className="photo-section">
               <div className="avatar-container">
-          <IonAvatar className="profile-avatar">
-            {extraData.foto ? (
-              <img src={`http://localhost:8000${extraData.foto}`} alt="Foto de perfil" />
-            ) : (
-              <IonIcon icon={personOutline} className="avatar-placeholder" />
-            )}
-          </IonAvatar>
-                
-                {/* Input oculto para subir archivos */}
+                <IonAvatar className="profile-avatar">
+                  {extraData.foto ? (
+                    <img src={`http://localhost:8000${extraData.foto}`} alt="Foto de perfil" />
+                  ) : (
+                    <IonIcon icon={personOutline} className="avatar-placeholder" />
+                  )}
+                </IonAvatar>
                 <input 
                   type="file" 
                   id="photo-upload"
@@ -133,20 +145,14 @@ const handlePhotoUpload = async (event: any) => {
                   onChange={handlePhotoUpload}
                   style={{ display: 'none' }}
                 />
-                
-                {/* Botón para subir foto */}
-                <IonButton 
-                  fill="clear" 
-                  className="photo-upload-button"
-                  onClick={() => document.getElementById('photo-upload')?.click()}
-                >
+                <IonButton fill="clear" className="photo-upload-button" onClick={() => document.getElementById('photo-upload')?.click()}>
                   <IonIcon icon={cameraOutline} slot="start" />
                   Subir Foto
                 </IonButton>
               </div>
             </div>
 
-            {/* Campos del formulario */}
+            {/* Formulario */}
             <div className="form-fields-vertical">
 
               {/* Nombre */}
@@ -172,13 +178,7 @@ const handlePhotoUpload = async (event: any) => {
                 <IonLabel className="category-label">Teléfono</IonLabel>
                 <IonItem className="field-item" lines="none">
                   <IonIcon icon={callOutline} className="field-icon" />
-                  <IonInput 
-                    name="telefono"
-                    value={extraData.telefono}
-                    onIonChange={handleChange}
-                    placeholder="Escribe tu teléfono..."
-                    className="field-input"
-                  />
+                  <IonInput name="telefono" value={extraData.telefono} onIonChange={handleChange} placeholder="Escribe tu teléfono..." className="field-input" />
                 </IonItem>
               </div>
 
@@ -187,14 +187,7 @@ const handlePhotoUpload = async (event: any) => {
                 <IonLabel className="category-label">Región</IonLabel>
                 <IonItem className="field-item" lines="none">
                   <IonIcon icon={locationOutline} className="field-icon" />
-                  <IonSelect
-                    name="region"
-                    value={extraData.region}
-                    placeholder="Selecciona tu región"
-                    onIonChange={handleChange}
-                    className="field-select"
-                    interface="action-sheet"
-                  >
+                  <IonSelect name="region" value={extraData.region} placeholder="Selecciona tu región" onIonChange={handleChange} className="field-select" interface="action-sheet">
                     {regiones.map(region => (
                       <IonSelectOption key={region} value={region}>{region}</IonSelectOption>
                     ))}
@@ -207,15 +200,7 @@ const handlePhotoUpload = async (event: any) => {
                 <IonLabel className="category-label">Comuna</IonLabel>
                 <IonItem className="field-item" lines="none">
                   <IonIcon icon={locationOutline} className="field-icon" />
-                  <IonSelect
-                    name="comuna"
-                    value={extraData.comuna}
-                    placeholder="Selecciona tu comuna"
-                    onIonChange={handleChange}
-                    disabled={!extraData.region}
-                    className="field-select"
-                    interface="action-sheet"
-                  >
+                  <IonSelect name="comuna" value={extraData.comuna} placeholder="Selecciona tu comuna" onIonChange={handleChange} disabled={!extraData.region} className="field-select" interface="action-sheet">
                     {extraData.region && regionesData[extraData.region].map((comuna: string) => (
                       <IonSelectOption key={comuna} value={comuna}>{comuna}</IonSelectOption>
                     ))}
