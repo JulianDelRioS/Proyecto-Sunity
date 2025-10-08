@@ -25,3 +25,21 @@ CREATE TABLE usuarios (
     comuna VARCHAR(100),                  -- Comuna del usuario
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+CREATE TABLE grupos_deportivos (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) UNIQUE NOT NULL,  -- Ej: "Fútbol", "Básquetbol", "Running"
+    descripcion TEXT                      -- Opcional, para detallar el grupo
+);
+
+
+
+(Relación muchos a muchos: un usuario puede unirse a varios grupos)
+CREATE TABLE usuarios_grupos (
+    usuario_id VARCHAR(255) REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    grupo_id INT REFERENCES grupos_deportivos(id) ON DELETE CASCADE,
+    fecha_union TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuario_id, grupo_id)
+);

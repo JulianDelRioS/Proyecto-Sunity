@@ -4,12 +4,15 @@ import './Styles/Principal.css';
 import Logo from "../components/Imagenes/logo.png";
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import {getProfile } from '../components/funciones';
+import { getProfile } from '../components/funciones';
 import Hamburguesa from '../components/Hamburguesa';
+import NavigationBar from '../components/NavigationBar';
+
 
 const Principal: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<string>('grupos');
 
   useEffect(() => {
     const checkSession = async () => {
@@ -22,6 +25,10 @@ const Principal: React.FC = () => {
     };
     checkSession();
   }, [history]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
 
   if (!user) {
     return <IonPage><IonContent>Verificando sesión...</IonContent></IonPage>;
@@ -47,11 +54,20 @@ const Principal: React.FC = () => {
           </div>
           
           <div className="white-container">
-            {/* Contenido dentro del contenedor */}
+              <h2 className="welcome-message">
+                Bienvenido a Sunity, {user.name}!
+              </h2>
+
+            {/* Contenido de las pestañas */}
           </div>
 
         </div>
+
+        {/* Barra de navegación inferior */}
+        <NavigationBar activeTab={activeTab} onTabChange={handleTabChange} />
+        
       </IonContent>
+
     </IonPage>
   );
 };

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 .home-content {
   display: flex;
   justify-content: center; /* centra horizontalmente el contenedor */
@@ -30,3 +31,14 @@
 }
 
 
+.home-center {
+  padding-bottom: 70px; /* Espacio para la barra de navegación */
+}
+
+.welcome-message {
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}

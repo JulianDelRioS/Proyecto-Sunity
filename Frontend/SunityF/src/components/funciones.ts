@@ -5,8 +5,21 @@ export const logout = async (history: any) => {
       method: "POST",
       credentials: "include",
     });
+
     if (res.ok) {
-      history.push("/home"); // redirige a home
+      // 🔹 Limpia cualquier dato de usuario guardado localmente
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+
+      // 🔹 Si usas estado global (React Context, Redux, etc.)
+      // asegúrate de resetear el estado del usuario también:
+      // setUser(null);
+
+      // 🔹 Redirige a home
+      history.push("/home");
+
+      // 🔹 (Opcional) Forzar actualización de la UI
+      window.location.reload(); // solo si tu UI no se actualiza automáticamente
     }
   } catch (err) {
     console.error("Error cerrando sesión:", err);
