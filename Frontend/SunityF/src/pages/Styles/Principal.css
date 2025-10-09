@@ -1,44 +1,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/* Centra el contenido principal */
 .home-content {
   display: flex;
-  justify-content: center; /* centra horizontalmente el contenedor */
-  align-items: center;     /* centra verticalmente */
+  justify-content: center;
+  align-items: center;
   height: 100%;
 }
 
+/* Contenedor blanco principal */
 .white-container {
-  width: 100%;            /* ocupa todo el ancho horizontal */
-  height: 80%;            /* 80% del alto del viewport */
+  width: 100%;
+  height: calc(100vh - 160px); /* usa casi todo el alto visible (ajusta si lo necesitas) */
   background-color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   padding: 20px;
-  display: flex;          /* opcional: centrar contenido interno */
-  justify-content: center;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto; /* scroll interno si hay mucho contenido */
+  box-sizing: border-box;
 }
 
+/* Contenedor superior con título y menú */
 .title-menu-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* h1 a la izquierda, menú a la derecha */
+  justify-content: space-between;
   width: 100%;
+  margin-bottom: 10px;
 }
 
+/* Logo */
 .logo-icon {
   width: 40px;
   height: 40px;
   margin-left: 10px;
 }
 
-
+/* Ajusta el espacio inferior para que no tape la barra de navegación */
 .home-center {
-  padding-bottom: 70px; /* Espacio para la barra de navegación */
+  padding-bottom: 90px; /* deja espacio suficiente para la barra inferior */
 }
 
+/* Estilo del mensaje de bienvenida */
 .welcome-message {
   font-size: 24px;
   font-weight: bold;
   color: #667eea;
   text-align: center;
   font-family: 'Poppins', sans-serif;
+}
+
+/* Scroll más suave */
+.white-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.white-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
 }

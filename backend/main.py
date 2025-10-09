@@ -309,3 +309,27 @@ def get_telefono(access_token: str = Cookie(None)):
     if not data:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return {"telefono": data["telefono"]}
+
+
+# =========================================
+# RUTA GRUPOS
+# =========================================
+
+@app.get("/grupos")
+def get_all_grupos():
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT id, nombre, descripcion FROM grupos_deportivos ORDER BY nombre ASC")
+        grupos = cur.fetchall()  # Esto devuelve RealDictRow si usas RealDictCursor
+        print("DEBUG grupos:", grupos)
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print("Error obteniendo grupos:", e)
+        raise HTTPException(status_code=500, detail=f"Error interno obteniendo grupos: {e}")
+
+    grupos_list = [
+        {"id": g["id"], "nombre": g["nombre"], "descripcion": g["descripcion"]} for g in grupos
+    ]
+    return {"ok": True, "grupos": grupos_list}

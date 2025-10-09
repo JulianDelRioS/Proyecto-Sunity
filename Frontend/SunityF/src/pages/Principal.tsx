@@ -7,7 +7,9 @@ import { useEffect, useState } from 'react';
 import { getProfile } from '../components/funciones';
 import Hamburguesa from '../components/Hamburguesa';
 import NavigationBar from '../components/NavigationBar';
-
+import Grupos from '../components/Grupos';
+import CrearEvento from '../components/CrearEvento';
+import Horarios from '../components/Horarios';
 
 const Principal: React.FC = () => {
   const history = useHistory();
@@ -52,13 +54,10 @@ const Principal: React.FC = () => {
             </h1>
             <IonMenuButton className="custom-menu-button" />
           </div>
-          
           <div className="white-container">
-              <h2 className="welcome-message">
-                Bienvenido a Sunity, {user.name}!
-              </h2>
-
-            {/* Contenido de las pestañas */}
+            {activeTab === 'grupos' && <Grupos />}
+            {activeTab === 'Crear evento' && <CrearEvento />}
+            {activeTab === 'horarios' && <Horarios />}
           </div>
 
         </div>
