@@ -1,0 +1,425 @@
+/* Informacion.css - Diseño Profesional */
+
+/* Contenedor principal */
+.info-content {
+  width: 100%;
+  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Secciones de información */
+.info-section {
+  margin-bottom: 5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Encabezado de sección */
+.section-header {
+  margin-bottom: 3rem;
+  text-align: center;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.title-underline {
+  height: 4px;
+  width: 100px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0 auto;
+  border-radius: 4px;
+  position: relative;
+}
+
+.title-underline::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 8px;
+  background: #3498db;
+  border-radius: 4px;
+}
+
+/* Grid de contenido */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.content-grid.reverse {
+  grid-template-columns: 1fr;
+}
+
+/* Contenido de texto */
+.text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.intro-text {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #5a6c7d;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* Tarjetas mejoradas */
+.mission-card, .vision-card, .purpose-card, .community-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.mission-card::before, .vision-card::before, .purpose-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.mission-card:hover, .vision-card:hover, .purpose-card:hover, .community-section:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.vision-card::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.purpose-card::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+/* Cómo funciona - Diseño mejorado */
+.how-it-works {
+  margin-top: 1rem;
+}
+
+.section-subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.section-subtitle::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid #f1f3f4;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-color: #3498db;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-right: 1.2rem;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.feature-text {
+  flex: 1;
+  color: #5a6c7d;
+  line-height: 1.6;
+}
+
+.feature-text strong {
+  color: #2c3e50;
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+/* Grid de beneficios mejorado */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.benefit-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.benefit-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.benefit-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.benefit-card p {
+  color: #5a6c7d;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Animaciones suaves */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.info-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.info-section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+/* Responsive Design Mejorado */
+@media (min-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+  
+  .content-grid.reverse {
+    grid-template-columns: 1fr;
+  }
+  
+  .intro-text {
+    font-size: 1.3rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+  }
+  
+  .feature-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .feature-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .card-title {
+    font-size: 1.3rem;
+  }
+  
+  .mission-card, .vision-card, .purpose-card, .community-section {
+    padding: 1.5rem;
+  }
+  
+  .feature-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.2rem;
+  }
+  
+  .feature-icon {
+    margin-right: 0;
+    margin-bottom: 0.8rem;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Efectos de hover suaves */
+.white-container {
+  transition: all 0.3s ease;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .info-section,
+  .mission-card,
+  .vision-card,
+  .purpose-card,
+  .benefit-card,
+  .feature-item {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Estilos para texto seleccionado */
+::selection {
+  background: rgba(52, 152, 219, 0.2);
+  color: #2c3e50;
+}
+
+::-moz-selection {
+  background: rgba(52, 152, 219, 0.2);
+  color: #2c3e50;
+}
+
+.back-button-container {
+  width: 100%;
+  max-width: 400px; /* igual que tu white-container */
+  margin: 20px auto 0;
+}
+
+.back-button {
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+  padding: 12px 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #4338ca 0%, #5855eb 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+  font-size: 20px;
+  user-select: none; /* evita que se seleccione el texto al hacer clic */
+}
+
+.back-button:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #7266eb 100%);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.back-button:active {
+  transform: translateY(0);
+}

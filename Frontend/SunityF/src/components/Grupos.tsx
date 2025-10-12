@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Grupos.css';
 
+
 interface Grupo {
   id: number;
   nombre: string;
@@ -75,7 +76,7 @@ const Grupos: React.FC = () => {
           <div className="header-content">
             <h1>Grupos Deportivos</h1>
             <p className="grupos-subtitle">
-              Descubre y únete a nuestros grupos deportivos especializados
+              Descubre nuestros grupos deportivos especializados
             </p>
           </div>
           <div className="header-stats">
@@ -109,10 +110,7 @@ const Grupos: React.FC = () => {
                     <p className="grupo-descripcion">{grupo.descripcion}</p>
                     <div className="card-actions">
                       <button className="btn-primary">
-                        Ver detalles
-                      </button>
-                      <button className="btn-secondary">
-                        Unirse
+                        Ver eventos
                       </button>
                     </div>
                   </div>

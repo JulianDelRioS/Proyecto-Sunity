@@ -130,27 +130,28 @@ const MiPerfil: React.FC = () => {
 
             {/* Foto de perfil */}
             <div className="photo-section">
-              <div className="avatar-container">
-                <IonAvatar className="profile-avatar">
-                  {extraData.foto ? (
-                    <img src={`http://localhost:8000${extraData.foto}`} alt="Foto de perfil" />
-                  ) : (
-                    <IonIcon icon={personOutline} className="avatar-placeholder" />
-                  )}
-                </IonAvatar>
-                <input 
-                  type="file" 
-                  id="photo-upload"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  style={{ display: 'none' }}
-                />
-                <IonButton fill="clear" className="photo-upload-button" onClick={() => document.getElementById('photo-upload')?.click()}>
-                  <IonIcon icon={cameraOutline} slot="start" />
-                  Subir Foto
-                </IonButton>
-              </div>
+              <IonAvatar className="profile-avatar">
+                {extraData.foto ? (
+                  <img src={`http://localhost:8000${extraData.foto}`} alt="Foto de perfil" />
+                ) : (
+                  <IonIcon icon={personOutline} className="avatar-placeholder" />
+                )}
+              </IonAvatar>
+              
+              <input 
+                type="file" 
+                id="photo-upload"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                style={{ display: 'none' }}
+              />
+              
+              <IonButton fill="clear" className="photo-upload-button" onClick={() => document.getElementById('photo-upload')?.click()}>
+                <IonIcon icon={cameraOutline} slot="start" />
+                Editar Foto
+              </IonButton>
             </div>
+
 
             {/* Formulario */}
             <div className="form-fields-vertical">

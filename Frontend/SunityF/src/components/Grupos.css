@@ -198,24 +198,6 @@
   box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
 }
 
-.btn-secondary {
-  background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  flex: 1;
-}
-
-.btn-secondary:hover {
-  background: #667eea;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.2);
-}
 
 /* Estados de carga y error a pantalla completa */
 .fullscreen-loading,

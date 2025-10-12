@@ -4,6 +4,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Principal from './pages/Principal';
 import MiPerfil from './pages/MiPerfil';
+import Informacion from './pages/Informacion';
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -52,6 +53,9 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/MiPerfil">
           <MiPerfil />
+        </Route>
+        <Route exact path="/Informacion">
+          <Informacion />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

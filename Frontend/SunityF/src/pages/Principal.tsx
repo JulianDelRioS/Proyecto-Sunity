@@ -42,8 +42,6 @@ const Principal: React.FC = () => {
       {/* MENÚ HAMBURGUESA IMPORTADO */}
       <Hamburguesa user={user} contentId="main-content" />
 
-      <IonHeader></IonHeader>
-
       <IonContent id="main-content">
         <div className="home-center">
           {/* H1 y botón de menú juntos */}

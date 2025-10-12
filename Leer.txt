@@ -35,11 +35,21 @@ CREATE TABLE grupos_deportivos (
 );
 
 
+CREATE TABLE eventos_deportivos (
+    id SERIAL PRIMARY KEY,
+    grupo_id INT REFERENCES grupos_deportivos(id) ON DELETE CASCADE, -- Evento pertenece a un grupo
+    nombre VARCHAR(100) NOT NULL,      -- Nombre del evento
+    descripcion TEXT,                  -- Descripción del evento
+    fecha_hora TIMESTAMP NOT NULL,     -- Fecha y hora del evento
+    lugar VARCHAR(200),                -- Nombre del lugar (ej: "Parque O'Higgins")
+    latitud DECIMAL(9,6),              -- Latitud para Google Maps
+    longitud DECIMAL(9,6),             -- Longitud para Google Maps
+    max_participantes INT NOT NULL      -- Cantidad máxima de participantes
+);
 
-(Relación muchos a muchos: un usuario puede unirse a varios grupos)
-CREATE TABLE usuarios_grupos (
-    usuario_id VARCHAR(255) REFERENCES usuarios(google_id) ON DELETE CASCADE,
-    grupo_id INT REFERENCES grupos_deportivos(id) ON DELETE CASCADE,
-    fecha_union TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (usuario_id, grupo_id)
+CREATE TABLE usuarios_eventos (
+    id SERIAL PRIMARY KEY,
+    usuario_id VARCHAR(255) REFERENCES usuarios(google_id) ON DELETE CASCADE, -- Usuario que se une
+    evento_id INT REFERENCES eventos_deportivos(id) ON DELETE CASCADE,        -- Evento al que se une
+    fecha_union TIMESTAMP DEFAULT CURRENT_TIMESTAMP                           -- Fecha de inscripción al evento
 );

@@ -1,6 +1,7 @@
+from typing import Optional
 from fastapi import FastAPI, HTTPException, Response, Cookie, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from google.oauth2 import id_token as google_id_token  # type: ignore
 from google.auth.transport import requests as google_requests  # type: ignore
 from jose import jwt
@@ -333,3 +334,72 @@ def get_all_grupos():
         {"id": g["id"], "nombre": g["nombre"], "descripcion": g["descripcion"]} for g in grupos
     ]
     return {"ok": True, "grupos": grupos_list}
+
+# Modelo Pydantic para crear un evento
+class EventoCrear(BaseModel):
+    grupo_id: int
+    nombre: str
+    descripcion: Optional[str] = ""
+    fecha_hora: datetime
+    lugar: str
+    latitud: float
+    longitud: float
+    max_participantes: int
+
+
+# Endpoint para crear un evento
+@app.post("/eventos")
+def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+
+    # Validación básica
+    if evento.max_participantes <= 0:
+        raise HTTPException(status_code=400, detail="max_participantes debe ser mayor a 0")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        # Verificar que el grupo existe
+        cur.execute("SELECT id FROM grupos_deportivos WHERE id = %s", (evento.grupo_id,))
+        grupo = cur.fetchone()
+        if not grupo:
+            raise HTTPException(status_code=400, detail="El grupo_id no existe")
+
+        # Insertar evento
+        cur.execute(
+            """
+            INSERT INTO eventos_deportivos
+            (grupo_id, nombre, descripcion, fecha_hora, lugar, latitud, longitud, max_participantes)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+            """,
+            (
+                evento.grupo_id,
+                evento.nombre,
+                evento.descripcion,
+                evento.fecha_hora,
+                evento.lugar,
+                evento.latitud,
+                evento.longitud,
+                evento.max_participantes
+            )
+        )
+
+        # Obtener el id del evento recién insertado (RealDictCursor devuelve diccionario)
+        evento_id = cur.fetchone()["id"]
+
+        conn.commit()
+        cur.close()
+        conn.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error creando evento:", e)
+        raise HTTPException(status_code=500, detail="Error interno creando evento")
+
+    return {
+        "ok": True,
+        "message": "Evento creado exitosamente",
+        "evento_id": evento_id
+    }
