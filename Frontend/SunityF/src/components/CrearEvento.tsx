@@ -29,7 +29,7 @@ const grupos: { id: number; nombre: string }[] = [
 
 const CrearEvento: React.FC = () => {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "",
+    googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE",
     libraries,
   });
 

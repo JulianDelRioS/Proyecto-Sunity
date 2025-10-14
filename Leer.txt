@@ -38,6 +38,7 @@ CREATE TABLE grupos_deportivos (
 CREATE TABLE eventos_deportivos (
     id SERIAL PRIMARY KEY,
     grupo_id INT REFERENCES grupos_deportivos(id) ON DELETE CASCADE, -- Evento pertenece a un grupo
+    anfitrion_id VARCHAR(255) REFERENCES usuarios(google_id) ON DELETE CASCADE,
     nombre VARCHAR(100) NOT NULL,      -- Nombre del evento
     descripcion TEXT,                  -- Descripción del evento
     fecha_hora TIMESTAMP NOT NULL,     -- Fecha y hora del evento

@@ -348,6 +348,7 @@ class EventoCrear(BaseModel):
     precio: int
 
 
+
 # Endpoint para crear un evento
 @app.post("/eventos")
 def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
@@ -367,12 +368,12 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
         if not grupo:
             raise HTTPException(status_code=400, detail="El grupo_id no existe")
 
-        # Insertar evento
+        # Insertar evento incluyendo anfitrion_id
         cur.execute(
             """
             INSERT INTO eventos_deportivos
-            (grupo_id, nombre, descripcion, fecha_hora, lugar, latitud, longitud, max_participantes, precio)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (grupo_id, nombre, descripcion, fecha_hora, lugar, latitud, longitud, max_participantes, precio, anfitrion_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (
@@ -384,11 +385,12 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
                 evento.latitud,
                 evento.longitud,
                 evento.max_participantes,
-                evento.precio
+                evento.precio,
+                user_id  # <-- aquí asignamos el anfitrión
             )
         )
 
-        # Obtener el id del evento recién insertado (RealDictCursor devuelve diccionario)
+        # Obtener el id del evento recién insertado
         evento_id = cur.fetchone()["id"]
 
         conn.commit()
