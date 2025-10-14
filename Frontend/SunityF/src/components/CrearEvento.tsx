@@ -14,6 +14,7 @@ interface EventoForm {
   lugar: string;
   max_participantes: number;
   grupo_id: number;
+  precio: number;
 }
 
 // Lista de grupos con su número y nombre
@@ -40,6 +41,7 @@ const CrearEvento: React.FC = () => {
     lugar: "",
     max_participantes: 10,
     grupo_id: 1,
+    precio: 0,
   });
   const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'warning'; message: string } | null>(null);
 
@@ -70,9 +72,10 @@ const CrearEvento: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const value = e.target.name === "grupo_id" || e.target.name === "max_participantes" 
-      ? parseInt(e.target.value) 
-      : e.target.value;
+    let value: string | number = e.target.value;
+    if (["grupo_id", "max_participantes", "precio"].includes(e.target.name)) {
+      value = parseInt(value);
+    }
     setForm({ ...form, [e.target.name]: value });
   };
 
@@ -80,6 +83,12 @@ const CrearEvento: React.FC = () => {
     e.preventDefault();
     if (!marker) {
       showNotification('warning', "Selecciona la ubicación en el mapa o busca una dirección");
+      return;
+    }
+
+    // Validación de precio
+    if (form.precio < 0 || form.precio > 10000) {
+      showNotification('error', "El precio debe ser entre 0 y 10,000");
       return;
     }
 
@@ -99,7 +108,6 @@ const CrearEvento: React.FC = () => {
       const data = await res.json();
       if (data.ok) {
         showNotification('success', "🎉 Evento creado exitosamente!");
-        // Reset form
         setForm({
           nombre: "",
           descripcion: "",
@@ -107,6 +115,7 @@ const CrearEvento: React.FC = () => {
           lugar: "",
           max_participantes: 10,
           grupo_id: 1,
+          precio: 0,
         });
         setMarker(null);
       } else {
@@ -153,7 +162,7 @@ const CrearEvento: React.FC = () => {
           <div className="header-content">
             <h2>Crear Evento Deportivo</h2>
             <p className="evento-subtitle">
-              Organiza y comparte actividades deportivas con la comunidad Sunity
+              Organiza tu evento deportivo y comparte cada detalle con la comunidad!
             </p>
           </div>
         </div>
@@ -221,6 +230,21 @@ const CrearEvento: React.FC = () => {
                     onChange={handleChange}
                     min={1}
                     max={100}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="precio">Precio o Cuota por participante</label>
+                  <input
+                    type="number"
+                    id="precio"
+                    name="precio"
+                    value={form.precio}
+                    onChange={handleChange}
+                    min={0}
+                    max={10000}
+                    step={100}  // <-- Aquí definimos el incremento de 100
                     required
                   />
                 </div>
@@ -296,6 +320,7 @@ const CrearEvento: React.FC = () => {
                         lugar: "",
                         max_participantes: 10,
                         grupo_id: 1,
+                        precio: 0,
                       });
                       setMarker(null);
                       showNotification('success', "Formulario limpiado correctamente");

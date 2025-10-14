@@ -345,6 +345,7 @@ class EventoCrear(BaseModel):
     latitud: float
     longitud: float
     max_participantes: int
+    precio: int
 
 
 # Endpoint para crear un evento
@@ -370,8 +371,8 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
         cur.execute(
             """
             INSERT INTO eventos_deportivos
-            (grupo_id, nombre, descripcion, fecha_hora, lugar, latitud, longitud, max_participantes)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            (grupo_id, nombre, descripcion, fecha_hora, lugar, latitud, longitud, max_participantes, precio)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (
@@ -382,7 +383,8 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
                 evento.lugar,
                 evento.latitud,
                 evento.longitud,
-                evento.max_participantes
+                evento.max_participantes,
+                evento.precio
             )
         )
 

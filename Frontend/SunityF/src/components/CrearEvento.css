@@ -27,12 +27,14 @@
   width: 100%;
   padding: 40px 24px;
 }
+#precio,
 #nombre,
 #fecha_hora,
 #lugar,
 #max_participantes {
   color: #000;
 }
+
 /* Header */
 .evento-header {
   display: flex;

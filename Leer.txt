@@ -44,7 +44,8 @@ CREATE TABLE eventos_deportivos (
     lugar VARCHAR(200),                -- Nombre del lugar (ej: "Parque O'Higgins")
     latitud DECIMAL(9,6),              -- Latitud para Google Maps
     longitud DECIMAL(9,6),             -- Longitud para Google Maps
-    max_participantes INT NOT NULL      -- Cantidad máxima de participantes
+    max_participantes INT NOT NULL,    -- Cantidad máxima de participantes
+    precio INT NOT NULL                -- Precio del evento (entero, en pesos por ejemplo)
 );
 
 CREATE TABLE usuarios_eventos (
