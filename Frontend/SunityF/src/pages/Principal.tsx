@@ -10,11 +10,13 @@ import NavigationBar from '../components/NavigationBar';
 import Grupos from '../components/Grupos';
 import CrearEvento from '../components/CrearEvento';
 import Horarios from '../components/Horarios';
+import Eventos from '../components/eventos'; // nuevo componente
 
 const Principal: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('grupos');
+  const [selectedGrupoId, setSelectedGrupoId] = useState<number | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -52,10 +54,17 @@ const Principal: React.FC = () => {
             </h1>
             <IonMenuButton className="custom-menu-button" />
           </div>
+          
           <div className="white-container">
-            {activeTab === 'grupos' && <Grupos />}
+            {activeTab === 'grupos' && 
+              <Grupos onVerEventos={(grupoId) => {
+                setSelectedGrupoId(grupoId); // guardar grupo seleccionado
+                handleTabChange('eventos');
+              }} 
+            />}
             {activeTab === 'Crear evento' && <CrearEvento />}
             {activeTab === 'horarios' && <Horarios />}
+            {activeTab === 'eventos' && <Eventos grupoId={selectedGrupoId} />}
           </div>
 
         </div>

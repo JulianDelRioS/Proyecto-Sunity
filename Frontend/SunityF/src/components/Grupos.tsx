@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './Grupos.css';
 
-
 interface Grupo {
   id: number;
   nombre: string;
   descripcion: string;
 }
 
-const Grupos: React.FC = () => {
+interface GruposProps {
+  onVerEventos: (grupoId: number) => void;
+}
+
+const Grupos: React.FC<GruposProps> = ({ onVerEventos }) => {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +112,7 @@ const Grupos: React.FC = () => {
                     </div>
                     <p className="grupo-descripcion">{grupo.descripcion}</p>
                     <div className="card-actions">
-                      <button className="btn-primary">
+                      <button className="btn-primary" onClick={() => onVerEventos(grupo.id)}>
                         Ver eventos
                       </button>
                     </div>

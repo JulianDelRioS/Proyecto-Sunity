@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import os
 from bd import get_connection
 from fastapi.staticfiles import StaticFiles
+import psycopg2.extras  # Necesario para RealDictCursor
 import shutil
 
 # =========================================
@@ -349,9 +350,11 @@ class EventoCrear(BaseModel):
 
 
 
-# Endpoint para crear un evento
+
+
 @app.post("/eventos")
 def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
+    # Obtener el usuario actual a partir del JWT
     user_id = verify_token(access_token)
 
     # Validación básica
@@ -360,15 +363,16 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
 
     try:
         conn = get_connection()
-        cur = conn.cursor()
+        # Cursor como diccionario para acceder a columnas por nombre
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        # Verificar que el grupo existe
+        # 1️ Verificar que el grupo existe
         cur.execute("SELECT id FROM grupos_deportivos WHERE id = %s", (evento.grupo_id,))
         grupo = cur.fetchone()
         if not grupo:
             raise HTTPException(status_code=400, detail="El grupo_id no existe")
 
-        # Insertar evento incluyendo anfitrion_id
+        # 2️ Insertar evento incluyendo anfitrion_id y devolver su id
         cur.execute(
             """
             INSERT INTO eventos_deportivos
@@ -386,24 +390,106 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
                 evento.longitud,
                 evento.max_participantes,
                 evento.precio,
-                user_id  # <-- aquí asignamos el anfitrión
+                user_id
             )
         )
 
-        # Obtener el id del evento recién insertado
-        evento_id = cur.fetchone()["id"]
+        evento_creado = cur.fetchone()
+        if not evento_creado:
+            raise HTTPException(status_code=500, detail="No se pudo crear el evento")
 
+        evento_id = evento_creado["id"]
+
+        # 3️ Registrar automáticamente al anfitrión como participante
+        cur.execute(
+            """
+            INSERT INTO usuarios_eventos (usuario_id, evento_id)
+            VALUES (%s, %s)
+            ON CONFLICT DO NOTHING  -- evita duplicados si ya estaba registrado
+            """,
+            (user_id, evento_id)
+        )
+
+        # 4️ Commit y cierre
         conn.commit()
         cur.close()
         conn.close()
+
     except HTTPException:
         raise
     except Exception as e:
         print("Error creando evento:", e)
-        raise HTTPException(status_code=500, detail="Error interno creando evento")
+        raise HTTPException(status_code=500, detail=f"Error interno creando evento: {e}")
 
     return {
         "ok": True,
-        "message": "Evento creado exitosamente",
+        "message": "Evento creado exitosamente y anfitrión registrado como participante.",
         "evento_id": evento_id
     }
+
+
+
+@app.get("/grupos/{grupo_id}/eventos")
+def get_eventos_por_grupo(grupo_id: int):
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Verificar que el grupo existe
+        cur.execute("SELECT id, nombre FROM grupos_deportivos WHERE id = %s", (grupo_id,))
+        grupo = cur.fetchone()
+        if not grupo:
+            raise HTTPException(status_code=404, detail="Grupo no encontrado")
+
+        # Obtener todos los eventos del grupo con la cantidad de participantes y ubicación
+        cur.execute(
+            """
+            SELECT 
+                e.id AS evento_id,
+                e.nombre,
+                e.descripcion,
+                e.lugar,
+                e.fecha_hora,
+                e.precio,
+                e.max_participantes,
+                e.latitud,
+                e.longitud,
+                COUNT(ue.usuario_id) AS inscritos
+            FROM eventos_deportivos e
+            LEFT JOIN usuarios_eventos ue ON e.id = ue.evento_id
+            WHERE e.grupo_id = %s
+            GROUP BY e.id
+            ORDER BY e.fecha_hora ASC;
+            """,
+            (grupo_id,)
+        )
+
+        eventos = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        # Formatear participantes y agregar lat/lng
+        eventos_list = []
+        for e in eventos:
+            eventos_list.append({
+                "evento_id": e["evento_id"],
+                "nombre": e["nombre"],
+                "descripcion": e["descripcion"],
+                "lugar": e["lugar"],
+                "fecha_hora": e["fecha_hora"],
+                "precio": e["precio"],
+                "participantes": f"{e['inscritos']} / {e['max_participantes']}",
+                "latitud": e["latitud"],
+                "longitud": e["longitud"]
+            })
+
+        return {
+            "ok": True,
+            "grupo_id": grupo["id"],
+            "grupo_nombre": grupo["nombre"],
+            "eventos": eventos_list
+        }
+
+    except Exception as e:
+        print("Error obteniendo eventos por grupo:", e)
+        raise HTTPException(status_code=500, detail="Error interno obteniendo eventos")
