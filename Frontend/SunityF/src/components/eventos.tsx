@@ -26,7 +26,7 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
   const [eventoSeleccionado, setEventoSeleccionado] = useState<Evento | null>(null);
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: ""
+    googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
   });
 
   useEffect(() => {
@@ -54,7 +54,36 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     fetchEventos();
   }, [grupoId]);
 
-  // Estado sin grupo seleccionado
+  // Función para unirse a un evento
+  const unirseEvento = async (eventoId: number) => {
+    try {
+      const res = await fetch(`http://localhost:8000/eventos/${eventoId}/unirse`, {
+        method: 'POST',
+        credentials: 'include', // para enviar cookies
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al unirse al evento");
+
+      alert(data.message);
+
+      // Actualizar número de participantes en el modal y en la lista
+      setEventoSeleccionado((prev) =>
+        prev
+          ? { ...prev, participantes: `${data.participantes_actuales} / ${data.max_participantes}` }
+          : prev
+      );
+      setEventos((prev) =>
+        prev.map((e) =>
+          e.evento_id === eventoId
+            ? { ...e, participantes: `${data.participantes_actuales} / ${data.max_participantes}` }
+            : e
+        )
+      );
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   if (!grupoId) return (
     <div className="eventos-container">
       <div className="eventos-wrapper">
@@ -69,7 +98,6 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     </div>
   );
 
-  // Estado de carga
   if (loading) return (
     <div className="eventos-container">
       <div className="eventos-wrapper">
@@ -84,7 +112,6 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     </div>
   );
 
-  // Estado de error
   if (error) return (
     <div className="eventos-container">
       <div className="eventos-wrapper">
@@ -104,7 +131,6 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     </div>
   );
 
-  // Estado vacío (sin eventos)
   if (eventos.length === 0) return (
     <div className="eventos-container">
       <div className="eventos-wrapper">
@@ -205,12 +231,10 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
 
             {/* Cuerpo del modal */}
             <div className="modal-body">
-              {/* Descripción */}
               <div className="modal-descripcion">
                 <p>{eventoSeleccionado.descripcion}</p>
               </div>
 
-              {/* Grid de detalles */}
               <div className="modal-details-grid">
                 <div className="modal-detail-card">
                   <span className="detail-icon">📅</span>
@@ -250,9 +274,9 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                 <div className="modal-detail-card">
                   <span className="detail-icon">👥</span>
                   <div className="detail-content">
-                    <div className="detail-label">Estado</div>
+                    <div className="detail-label">Participantes</div>
                     <div className="detail-value">
-                      {eventoSeleccionado.participantes ? 'Con participantes' : 'Abierto para unirse'}
+                      {eventoSeleccionado.participantes || 'Aún no hay participantes'}
                     </div>
                   </div>
                 </div>
@@ -285,20 +309,14 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                 </div>
               </div>
 
-              {/* Participantes */}
-              <div className="modal-participantes">
-                <div className="participantes-header">
-                  <span className="detail-icon">👥</span>
-                  <h4>Participantes</h4>
-                  <div className="participantes-count">
-                    {eventoSeleccionado.participantes ? 
-                      eventoSeleccionado.participantes.split(',').length : 0}
-                  </div>
-                </div>
-                <div className="participantes-list">
-                  {eventoSeleccionado.participantes || 
-                    'Aún no hay participantes registrados. ¡Sé el primero en unirte!'}
-                </div>
+              {/* Botón Unirse */}
+              <div className="modal-unirse">
+                <button
+                  className="btn-unirse"
+                  onClick={() => unirseEvento(eventoSeleccionado.evento_id)}
+                >
+                  ✅ Unirse al evento
+                </button>
               </div>
             </div>
           </div>

@@ -366,13 +366,13 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
         # Cursor como diccionario para acceder a columnas por nombre
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        # 1️ Verificar que el grupo existe
+        #  Verificar que el grupo existe
         cur.execute("SELECT id FROM grupos_deportivos WHERE id = %s", (evento.grupo_id,))
         grupo = cur.fetchone()
         if not grupo:
             raise HTTPException(status_code=400, detail="El grupo_id no existe")
 
-        # 2️ Insertar evento incluyendo anfitrion_id y devolver su id
+        #  Insertar evento incluyendo anfitrion_id y devolver su id
         cur.execute(
             """
             INSERT INTO eventos_deportivos
@@ -400,7 +400,7 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
 
         evento_id = evento_creado["id"]
 
-        # 3️ Registrar automáticamente al anfitrión como participante
+        #  Registrar automáticamente al anfitrión como participante
         cur.execute(
             """
             INSERT INTO usuarios_eventos (usuario_id, evento_id)
@@ -410,7 +410,7 @@ def crear_evento(evento: EventoCrear, access_token: str = Cookie(None)):
             (user_id, evento_id)
         )
 
-        # 4️ Commit y cierre
+        #  Commit y cierre
         conn.commit()
         cur.close()
         conn.close()
@@ -493,3 +493,77 @@ def get_eventos_por_grupo(grupo_id: int):
     except Exception as e:
         print("Error obteniendo eventos por grupo:", e)
         raise HTTPException(status_code=500, detail="Error interno obteniendo eventos")
+
+
+
+
+
+@app.post("/eventos/{evento_id}/unirse")
+def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
+    # 1️⃣ Obtener usuario desde JWT
+    user_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # 2️⃣ Verificar que el evento existe
+        cur.execute(
+            "SELECT id, anfitrion_id, max_participantes FROM eventos_deportivos WHERE id = %s",
+            (evento_id,)
+        )
+        evento = cur.fetchone()
+        if not evento:
+            raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+        # 3️⃣ Verificar que el usuario no sea el anfitrión
+        if evento["anfitrion_id"] == user_id:
+            raise HTTPException(status_code=400, detail="El anfitrión no puede unirse como participante")
+
+        # 4️⃣ Verificar que el usuario no esté ya inscrito
+        cur.execute(
+            "SELECT 1 FROM usuarios_eventos WHERE usuario_id = %s AND evento_id = %s",
+            (user_id, evento_id)
+        )
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Ya estás inscrito en este evento")
+
+        # 5️⃣ Verificar cupo disponible
+        cur.execute(
+            "SELECT COUNT(*) AS inscritos FROM usuarios_eventos WHERE evento_id = %s",
+            (evento_id,)
+        )
+        inscritos = cur.fetchone()["inscritos"]
+        if inscritos >= evento["max_participantes"]:
+            raise HTTPException(status_code=400, detail="El evento ya alcanzó el número máximo de participantes")
+
+        # 6️⃣ Insertar usuario en el evento
+        cur.execute(
+            "INSERT INTO usuarios_eventos (usuario_id, evento_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+            (user_id, evento_id)
+        )
+        conn.commit()
+
+        # 7️⃣ Obtener número actualizado de participantes
+        cur.execute(
+            "SELECT COUNT(*) AS inscritos FROM usuarios_eventos WHERE evento_id = %s",
+            (evento_id,)
+        )
+        actual_inscritos = cur.fetchone()["inscritos"]
+
+        cur.close()
+        conn.close()
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error uniendo usuario al evento:", e)
+        raise HTTPException(status_code=500, detail="Error interno uniendo al usuario al evento")
+
+    return {
+        "ok": True,
+        "message": "Te has unido al evento exitosamente",
+        "participantes_actuales": actual_inscritos,
+        "max_participantes": evento["max_participantes"]
+    }
+

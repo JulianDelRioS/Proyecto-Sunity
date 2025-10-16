@@ -340,6 +340,32 @@
   display: inline-block;
 }
 
+
+/* Botón Unirse al Evento */
+.btn-unirse {
+  margin-top: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  align-self: flex-start;
+}
+
+.btn-unirse:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+
 /* Botón cerrar modal */
 .btn-cerrar {
   position: absolute;
