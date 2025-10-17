@@ -40,7 +40,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabChange })
       >
         <div className="nav-button-content">
           <span className="nav-icon">📅</span>
-          <span className="nav-label">Horarios</span>
+          <span className="nav-label">Mis horarios</span>
         </div>
       </IonButton>
     </div>

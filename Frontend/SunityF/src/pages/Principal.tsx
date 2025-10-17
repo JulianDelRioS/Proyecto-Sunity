@@ -9,7 +9,7 @@ import Hamburguesa from '../components/Hamburguesa';
 import NavigationBar from '../components/NavigationBar';
 import Grupos from '../components/Grupos';
 import CrearEvento from '../components/CrearEvento';
-import Horarios from '../components/Horarios';
+import CalendarioGigante from '../components/CalendarioGigante';
 import Eventos from '../components/eventos'; // nuevo componente
 
 const Principal: React.FC = () => {
@@ -63,7 +63,8 @@ const Principal: React.FC = () => {
               }} 
             />}
             {activeTab === 'Crear evento' && <CrearEvento />}
-            {activeTab === 'horarios' && <Horarios />}
+            {activeTab === 'horarios' && <CalendarioGigante />}
+
             {activeTab === 'eventos' && <Eventos grupoId={selectedGrupoId} />}
           </div>
 

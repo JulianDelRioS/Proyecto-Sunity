@@ -507,7 +507,7 @@ def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
         conn = get_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        # 2️⃣ Verificar que el evento existe
+        # Verificar que el evento existe
         cur.execute(
             "SELECT id, anfitrion_id, max_participantes FROM eventos_deportivos WHERE id = %s",
             (evento_id,)
@@ -516,11 +516,11 @@ def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
         if not evento:
             raise HTTPException(status_code=404, detail="Evento no encontrado")
 
-        # 3️⃣ Verificar que el usuario no sea el anfitrión
+        #  Verificar que el usuario no sea el anfitrión
         if evento["anfitrion_id"] == user_id:
             raise HTTPException(status_code=400, detail="El anfitrión no puede unirse como participante")
 
-        # 4️⃣ Verificar que el usuario no esté ya inscrito
+        #  Verificar que el usuario no esté ya inscrito
         cur.execute(
             "SELECT 1 FROM usuarios_eventos WHERE usuario_id = %s AND evento_id = %s",
             (user_id, evento_id)
@@ -528,7 +528,7 @@ def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
         if cur.fetchone():
             raise HTTPException(status_code=400, detail="Ya estás inscrito en este evento")
 
-        # 5️⃣ Verificar cupo disponible
+        #  Verificar cupo disponible
         cur.execute(
             "SELECT COUNT(*) AS inscritos FROM usuarios_eventos WHERE evento_id = %s",
             (evento_id,)
@@ -537,14 +537,14 @@ def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
         if inscritos >= evento["max_participantes"]:
             raise HTTPException(status_code=400, detail="El evento ya alcanzó el número máximo de participantes")
 
-        # 6️⃣ Insertar usuario en el evento
+        #  Insertar usuario en el evento
         cur.execute(
             "INSERT INTO usuarios_eventos (usuario_id, evento_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
             (user_id, evento_id)
         )
         conn.commit()
 
-        # 7️⃣ Obtener número actualizado de participantes
+        # Obtener número actualizado de participantes
         cur.execute(
             "SELECT COUNT(*) AS inscritos FROM usuarios_eventos WHERE evento_id = %s",
             (evento_id,)
@@ -567,3 +567,54 @@ def unirse_evento(evento_id: int, access_token: str = Cookie(None)):
         "max_participantes": evento["max_participantes"]
     }
 
+
+@app.get("/mis-eventos")
+def get_mis_eventos(access_token: str = Cookie(None)):
+    """
+    Obtiene todos los eventos de un usuario:
+    - Como anfitrión
+    - Como participante
+    Cada evento aparece solo una vez, con el campo 'tipo' indicando si eres 'anfitrion' o 'participante'.
+    """
+    user_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            """
+            SELECT 
+                e.id AS evento_id,
+                e.nombre,
+                e.descripcion,
+                e.lugar,
+                e.fecha_hora,
+                e.precio,
+                e.max_participantes,
+                e.latitud,
+                e.longitud,
+                CASE
+                    WHEN e.anfitrion_id = %s THEN 'anfitrion'
+                    ELSE 'participante'
+                END AS tipo,
+                COUNT(ue2.usuario_id) AS inscritos
+            FROM eventos_deportivos e
+            LEFT JOIN usuarios_eventos ue2 ON e.id = ue2.evento_id
+            LEFT JOIN usuarios_eventos ue1 ON e.id = ue1.evento_id AND ue1.usuario_id = %s
+            WHERE e.anfitrion_id = %s OR ue1.usuario_id = %s
+            GROUP BY e.id
+            ORDER BY e.fecha_hora ASC;
+            """,
+            (user_id, user_id, user_id, user_id)
+        )
+
+        eventos = cur.fetchall()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error obteniendo eventos del usuario:", e)
+        raise HTTPException(status_code=500, detail="Error interno obteniendo eventos del usuario")
+
+    return {"ok": True, "eventos": eventos}
