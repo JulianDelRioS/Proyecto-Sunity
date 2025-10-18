@@ -24,6 +24,7 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
   const [error, setError] = useState<string | null>(null);
   const [grupoNombre, setGrupoNombre] = useState<string>("");
   const [eventoSeleccionado, setEventoSeleccionado] = useState<Evento | null>(null);
+  const [participantesEvento, setParticipantesEvento] = useState<any | null>(null);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
@@ -59,14 +60,13 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     try {
       const res = await fetch(`http://localhost:8000/eventos/${eventoId}/unirse`, {
         method: 'POST',
-        credentials: 'include', // para enviar cookies
+        credentials: 'include',
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Error al unirse al evento");
 
       alert(data.message);
 
-      // Actualizar número de participantes en el modal y en la lista
       setEventoSeleccionado((prev) =>
         prev
           ? { ...prev, participantes: `${data.participantes_actuales} / ${data.max_participantes}` }
@@ -79,6 +79,20 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
             : e
         )
       );
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  // Función para obtener participantes y anfitrión
+  const fetchParticipantes = async (eventoId: number) => {
+    try {
+      const res = await fetch(`http://localhost:8000/eventos/${eventoId}/participantes`, {
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al obtener participantes");
+      setParticipantesEvento(data);
     } catch (err: any) {
       alert(err.message);
     }
@@ -201,12 +215,20 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                     </span>
                   </div>
 
-                  <button
-                    className="btn-ver-informacion"
-                    onClick={() => setEventoSeleccionado(evento)}
-                  >
-                    🔍 Ver información
-                  </button>
+                  <div className="evento-actions">
+                    <button
+                      className="btn-accion"
+                      onClick={() => setEventoSeleccionado(evento)}
+                    >
+                      🔍 Ver información
+                    </button>
+                    <button
+                      className="btn-accion"
+                      onClick={() => fetchParticipantes(evento.evento_id)}
+                    >
+                      👥 Ver participantes
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -214,22 +236,18 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
         </div>
       </div>
 
-      {/* Modal de información profesional */}
+      {/* Modal de información */}
       {eventoSeleccionado && (
         <div className="evento-modal" onClick={() => setEventoSeleccionado(null)}>
           <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
-            {/* Header del modal */}
             <div className="modal-header">
-              <button className="btn-cerrar" onClick={() => setEventoSeleccionado(null)}>
-                ×
-              </button>
+              <button className="btn-cerrar" onClick={() => setEventoSeleccionado(null)}>×</button>
               <h2>{eventoSeleccionado.nombre}</h2>
               <div className="modal-precio-badge">
                 {eventoSeleccionado.precio === 0 ? 'Evento Gratuito' : `$${eventoSeleccionado.precio}`}
               </div>
             </div>
 
-            {/* Cuerpo del modal */}
             <div className="modal-body">
               <div className="modal-descripcion">
                 <p>{eventoSeleccionado.descripcion}</p>
@@ -292,31 +310,85 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                   {isLoaded && (
                     <GoogleMap
                       mapContainerStyle={{ width: '100%', height: '100%' }}
-                      center={{ 
-                        lat: eventoSeleccionado.latitud, 
-                        lng: eventoSeleccionado.longitud 
-                      }}
+                      center={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
                       zoom={15}
                     >
-                      <Marker
-                        position={{ 
-                          lat: eventoSeleccionado.latitud, 
-                          lng: eventoSeleccionado.longitud 
-                        }}
-                      />
+                      <Marker position={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }} />
                     </GoogleMap>
                   )}
                 </div>
               </div>
 
-              {/* Botón Unirse */}
               <div className="modal-unirse">
-                <button
-                  className="btn-unirse"
-                  onClick={() => unirseEvento(eventoSeleccionado.evento_id)}
-                >
+                <button className="btn-unirse" onClick={() => unirseEvento(eventoSeleccionado.evento_id)}>
                   ✅ Unirse al evento
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de participantes */}
+      {participantesEvento && (
+        <div className="evento-modal" onClick={() => setParticipantesEvento(null)}>
+          <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <button className="btn-cerrar" onClick={() => setParticipantesEvento(null)}>×</button>
+              <h2>Participantes del Evento</h2>
+              <div className="modal-precio-badge">
+                {participantesEvento.evento.nombre}
+              </div>
+            </div>
+
+            <div className="modal-body">
+              <div className="modal-details-grid">
+                <div className="modal-detail-card anfitrion">
+                  <span className="detail-icon">👑</span>
+                  <div className="detail-content">
+                    <div className="detail-label">Anfitrión</div>
+                    <div className="detail-value">{participantesEvento.evento.anfitrion.nombre}</div>
+                    <div className="detail-subvalue">Email: {participantesEvento.evento.anfitrion.email}</div>
+                    <div className="detail-subvalue">Tel: {participantesEvento.evento.anfitrion.telefono}</div>
+                  </div>
+                </div>
+
+                <div className="modal-detail-card participantes-count">
+                  <span className="detail-icon">👥</span>
+                  <div className="detail-content">
+                    <div className="detail-label">Total de Participantes</div>
+                    <div className="detail-value">
+                      {participantesEvento.participantes.length + 1}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="participantes-section">
+                <h3 className="section-title">Lista de Participantes</h3>
+                {participantesEvento.participantes.length === 0 ? (
+                  <div className="empty-participantes">
+                    <span className="empty-icon">😔</span>
+                    <p>No hay otros participantes aún</p>
+                    <p className="empty-subtitle">¡Sé el primero en unirte!</p>
+                  </div>
+                ) : (
+                  <div className="participantes-list">
+                    {participantesEvento.participantes.map((p: any) => (
+                      <div key={p.id} className="participante-item">
+
+                        <div className="participante-info">
+                          <div className="participante-nombre">{p.nombre}</div>
+                          <div className="participante-contacto">
+                            <span>{p.email}</span>
+                            <span>•</span>
+                            <span>{p.telefono}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

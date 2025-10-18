@@ -618,3 +618,76 @@ def get_mis_eventos(access_token: str = Cookie(None)):
         raise HTTPException(status_code=500, detail="Error interno obteniendo eventos del usuario")
 
     return {"ok": True, "eventos": eventos}
+
+
+
+@app.get("/eventos/{evento_id}/participantes")
+def get_participantes_evento(evento_id: int):
+    """
+    Obtiene todos los participantes de un evento.
+    Devuelve al anfitrión con su correo y teléfono y luego el resto de participantes.
+    """
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Obtener información del evento y anfitrión
+        cur.execute(
+            """
+            SELECT 
+                e.id AS evento_id,
+                e.nombre AS evento_nombre,
+                e.anfitrion_id,
+                u.nombre AS anfitrion_nombre,
+                u.email AS anfitrion_email,
+                u.telefono AS anfitrion_telefono,
+                u.foto_perfil AS anfitrion_foto
+            FROM eventos_deportivos e
+            JOIN usuarios u ON e.anfitrion_id = u.google_id
+            WHERE e.id = %s
+            """,
+            (evento_id,)
+        )
+        evento = cur.fetchone()
+        if not evento:
+            raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+        # Obtener lista de participantes excluyendo al anfitrión
+        cur.execute(
+            """
+            SELECT 
+                u.google_id AS id,
+                u.nombre,
+                u.email,
+                u.telefono,
+                u.foto_perfil
+            FROM usuarios_eventos ue
+            JOIN usuarios u ON ue.usuario_id = u.google_id
+            WHERE ue.evento_id = %s AND ue.usuario_id != %s
+            """,
+            (evento_id, evento["anfitrion_id"])
+        )
+        participantes = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        return {
+            "ok": True,
+            "evento": {
+                "id": evento["evento_id"],
+                "nombre": evento["evento_nombre"],
+                "anfitrion": {
+                    "id": evento["anfitrion_id"],
+                    "nombre": evento["anfitrion_nombre"],
+                    "email": evento["anfitrion_email"],
+                    "telefono": evento["anfitrion_telefono"],
+                    "foto_perfil": evento["anfitrion_foto"]
+                }
+            },
+            "participantes": participantes
+        }
+
+    except Exception as e:
+        print("Error obteniendo participantes del evento:", e)
+        raise HTTPException(status_code=500, detail="Error interno obteniendo participantes del evento")

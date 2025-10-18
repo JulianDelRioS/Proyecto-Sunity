@@ -47,6 +47,11 @@ const CrearEvento: React.FC = () => {
 
   const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);
 
+  // Calcular la fecha mínima (4 horas más que la actual)
+  const now = new Date();
+  now.setHours(now.getHours() + 4);
+  const minDateTime = now.toISOString().slice(0, 16); // formato compatible con datetime-local
+
   const showNotification = (type: 'success' | 'error' | 'warning', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 5000);
@@ -89,6 +94,16 @@ const CrearEvento: React.FC = () => {
     // Validación de precio
     if (form.precio < 0 || form.precio > 10000) {
       showNotification('error', "El precio debe ser entre 0 y 10,000");
+      return;
+    }
+
+    // Validación de fecha mínima (4 horas después)
+    const selectedDate = new Date(form.fecha_hora);
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() + 4);
+
+    if (selectedDate < currentDate) {
+      showNotification('error', "La fecha del evento debe ser al menos 4 horas después de la hora actual");
       return;
     }
 
@@ -216,6 +231,7 @@ const CrearEvento: React.FC = () => {
                     name="fecha_hora"
                     value={form.fecha_hora}
                     onChange={handleChange}
+                    min={minDateTime}
                     required
                   />
                 </div>
@@ -244,7 +260,7 @@ const CrearEvento: React.FC = () => {
                     onChange={handleChange}
                     min={0}
                     max={10000}
-                    step={100}  // <-- Aquí definimos el incremento de 100
+                    step={100}
                     required
                   />
                 </div>
