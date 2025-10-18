@@ -376,7 +376,190 @@
   font-weight: 600;
   line-height: 1.4;
 }
+/* CalendarioGigante.css - Sección de Participantes */
 
+.modal-participantes {
+  margin-top: 24px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.modal-participantes h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-participantes h4::before {
+  content: "👥";
+  font-size: 1.2rem;
+}
+
+.participantes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Scrollbar personalizado para la lista de participantes */
+.participantes-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.participantes-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.participantes-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.participantes-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.participante-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.participante-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e0;
+}
+
+.participante-card:first-child {
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3d9 100%);
+  border-color: #ffd166;
+  position: relative;
+}
+
+.participante-card:first-child::before {
+  content: "Anfitrión";
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  background: #ffd166;
+  color: #7c6a0a;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.participante-card img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.participante-card:first-child img {
+  border-color: #ffd166;
+}
+
+.participante-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.participante-info strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.2;
+}
+
+.participante-info span {
+  font-size: 0.8rem;
+  color: #718096;
+  line-height: 1.3;
+}
+
+.participante-info span:first-of-type {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Estados vacíos */
+.participantes-list:empty::before {
+  content: "No hay participantes registrados";
+  text-align: center;
+  color: #a0aec0;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-participantes {
+    padding: 16px;
+    margin-top: 20px;
+  }
+  
+  .participante-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .participante-card img {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .participantes-list {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-participantes {
+    padding: 12px;
+  }
+  
+  .participante-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 16px 12px;
+  }
+  
+  .participante-info {
+    align-items: center;
+  }
+  
+  .participante-card:first-child::before {
+    top: -6px;
+    right: 50%;
+    transform: translateX(50%);
+    font-size: 0.65rem;
+  }
+}
 /* Botón cerrar modal */
 .btn-cerrar {
   position: absolute;
