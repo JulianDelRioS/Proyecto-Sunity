@@ -18,14 +18,31 @@
     0 4px 6px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0);
   width: 100%;
-  max-width: 400px;
+  max-width: 800px; /* más ancho para 4 columnas */
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.5) transparent;
   backdrop-filter: blur(10px);
+  animation: fadeInUp 0.5s ease-out;
 }
 
+/* Scroll personalizado */
+.perfil-container::-webkit-scrollbar {
+  width: 6px;
+}
+.perfil-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.perfil-container::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.5);
+  border-radius: 10px;
+}
+
+/* --- Foto de perfil --- */
 .profile-avatar ion-icon,
 .profile-avatar img {
   width: 100%;
@@ -76,14 +93,16 @@
   transform: translateY(-1px);
 }
 
-/* --- Campos del formulario --- */
-.form-fields-vertical {
+/* --- Campos del formulario en grid 2x4 --- */
+.form-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+  grid-template-rows: repeat(2, auto); /* 2 filas */
+  gap: 15px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
 }
 
+/* Cada campo individual */
 .field-group {
   display: flex;
   flex-direction: column;
@@ -186,19 +205,26 @@
 }
 
 /* --- Ajustes para móviles --- */
+@media screen and (max-width: 800px) {
+  .perfil-container {
+    max-width: 100%;
+  }
+
+  .form-fields-grid {
+    grid-template-columns: repeat(2, 1fr); /* en móviles 2 columnas */
+    grid-template-rows: auto; /* filas automáticas */
+    gap: 12px;
+  }
+}
+
 @media screen and (max-width: 500px) {
   .home-center {
     padding: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
 
   .perfil-container {
     padding: 20px;
-    max-width: 100%;
     border-radius: 16px;
-    box-shadow: 
-      0 8px 25px rgba(0, 0, 0, 0.15),
-      0 3px 5px rgba(0, 0, 0, 0.05);
   }
 
   .avatar-placeholder {
@@ -208,15 +234,6 @@
   .field-icon {
     font-size: 18px;
     margin-right: 10px;
-  }
-
-  .form-fields-vertical {
-    gap: 15px;
-  }
-
-  .field-item {
-    padding: 0 12px;
-    border-radius: 10px;
   }
 
   .category-label {
@@ -235,11 +252,6 @@
     transform: translateY(0);
   }
 }
-
-.perfil-container {
-  animation: fadeInUp 0.5s ease-out;
-}
-
 
 /* Mejora para los selects */
 .field-select::part(icon) {
@@ -274,9 +286,6 @@
 
 /* Modo oscuro */
 @media (prefers-color-scheme: dark) {
-
-
-
   .field-item {
     background: #1e1e1e;
     border: 2px solid #2d2d2d;
@@ -304,5 +313,4 @@
   .field-icon {
     color: #a5b4fc;
   }
-
 }

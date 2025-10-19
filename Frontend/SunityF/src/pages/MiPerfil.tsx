@@ -9,7 +9,8 @@ import {
   IonAvatar,
   IonIcon,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonTextarea
 } from '@ionic/react';
 import { personOutline, mailOutline, callOutline, locationOutline, saveOutline, cameraOutline } from 'ionicons/icons';
 import './Styles/Home.css';
@@ -32,7 +33,10 @@ const MiPerfil: React.FC = () => {
     telefono: "", 
     region: "", 
     comuna: "",
-    foto: "" 
+    foto: "",
+    edad: "",
+    deporte_favorito: "",
+    descripcion: ""
   });
 
   const regiones = Object.keys(regionesData);
@@ -45,27 +49,28 @@ const MiPerfil: React.FC = () => {
     if (!res.ok) throw new Error("Error cargando " + endpoint);
     const data = await res.json();
 
-    // Ajuste según lo que devuelve el backend
-    if (endpoint === "foto") return data.foto_perfil || "";
-    return data[endpoint] || "";
+    switch(endpoint) {
+      case "foto": return data.foto_perfil || "";
+      case "deporte": return data.deporte_favorito || "";
+      case "descripcion": return data.descripcion || "";
+      default: return data[endpoint] || "";
+    }
   };
 
   // Cargar todos los datos al iniciar
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        // Datos básicos (name, email)
         const res = await fetch('http://localhost:8000/profile', { credentials: 'include' });
         const basic = await res.json();
         setUser(basic.user);
 
-        // Datos extra
-        const foto = await fetchField("foto");
-        const telefono = await fetchField("telefono");
-        const region = await fetchField("region");
-        const comuna = await fetchField("comuna");
-
-        setExtraData({ foto, telefono, region, comuna });
+        const fields = ["foto", "telefono", "region", "comuna", "edad", "deporte", "descripcion"];
+        const loaded: any = {};
+        for (const f of fields) {
+          loaded[f === "deporte" ? "deporte_favorito" : f] = await fetchField(f);
+        }
+        setExtraData(loaded);
 
       } catch (err) {
         console.error("Error cargando perfil:", err);
@@ -152,7 +157,6 @@ const MiPerfil: React.FC = () => {
               </IonButton>
             </div>
 
-
             {/* Formulario */}
             <div className="form-fields-vertical">
 
@@ -180,6 +184,45 @@ const MiPerfil: React.FC = () => {
                 <IonItem className="field-item" lines="none">
                   <IonIcon icon={callOutline} className="field-icon" />
                   <IonInput name="telefono" value={extraData.telefono} onIonChange={handleChange} placeholder="Escribe tu teléfono..." className="field-input" />
+                </IonItem>
+              </div>
+
+              {/* Edad */}
+              <div className="field-group">
+                <IonLabel className="category-label">Edad</IonLabel>
+                <IonItem className="field-item" lines="none">
+                  <IonInput name="edad" type="number" value={extraData.edad} onIonChange={handleChange} placeholder="Escribe tu edad..." className="field-input" />
+                </IonItem>
+              </div>
+
+              {/* Deporte favorito */}
+              <div className="field-group">
+                <IonLabel className="category-label">Deporte favorito</IonLabel>
+                <IonItem className="field-item" lines="none">
+                  <IonSelect
+                    name="deporte_favorito"
+                    value={extraData.deporte_favorito}
+                    placeholder="Selecciona tu deporte favorito..."
+                    onIonChange={handleChange}
+                    className="field-select"
+                    interface="action-sheet"
+                  >
+                    <IonSelectOption value="Fútbol">Fútbol</IonSelectOption>
+                    <IonSelectOption value="Básquetbol">Básquetbol</IonSelectOption>
+                    <IonSelectOption value="Running">Running</IonSelectOption>
+                    <IonSelectOption value="Padel">Padel</IonSelectOption>
+                    <IonSelectOption value="Voleibol">Voleibol</IonSelectOption>
+                    <IonSelectOption value="Tenis">Tenis</IonSelectOption>
+                  </IonSelect>
+                </IonItem>
+              </div>
+
+
+              {/* Descripción */}
+              <div className="field-group">
+                <IonLabel className="category-label">Descripción</IonLabel>
+                <IonItem className="field-item" lines="none">
+                  <IonTextarea name="descripcion" value={extraData.descripcion} onIonChange={handleChange} placeholder="Escribe una breve descripción..." className="field-input" />
                 </IonItem>
               </div>
 

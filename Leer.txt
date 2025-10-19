@@ -23,6 +23,9 @@ CREATE TABLE usuarios (
     telefono CHAR(9),                     -- Número de teléfono chileno (9 dígitos)
     region VARCHAR(100),                  -- Región del usuario
     comuna VARCHAR(100),                  -- Comuna del usuario
+    deporte_favorito VARCHAR(50),
+    edad INTEGER,
+    descripcion TEXT,    
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

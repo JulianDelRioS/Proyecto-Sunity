@@ -44,10 +44,13 @@ class TokenIn(BaseModel):
     id_token: str
 
 class UpdateProfile(BaseModel):
-    """Modelo para actualizar datos de usuario."""
-    comuna: str
-    region: str
-    telefono: str
+    comuna: Optional[str] = None
+    region: Optional[str] = None
+    telefono: Optional[str] = None
+    edad: Optional[int] = None
+    deporte_favorito: Optional[str] = None
+    descripcion: Optional[str] = None
+
 
 # =========================================
 # RUTAS DE AUTENTICACIÓN
@@ -146,40 +149,43 @@ def logout(response: Response):
 # =========================================
 @app.post("/profile/update")
 def update_profile(data: UpdateProfile, access_token: str = Cookie(None)):
-    """
-    Actualiza los datos de perfil del usuario (comuna, region, telefono)
-    usando su JWT para identificarlo.
-    """
     if not access_token:
         raise HTTPException(status_code=401, detail="No autorizado")
-    
+
     try:
         payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
         user_id = payload["sub"]
     except Exception:
         raise HTTPException(status_code=401, detail="Token inválido")
-    
+
+    # Construir dinámicamente los campos a actualizar
+    campos = []
+    valores = []
+    for campo in ["comuna", "region", "telefono", "edad", "deporte_favorito", "descripcion"]:
+        valor = getattr(data, campo)
+        if valor is not None:
+            campos.append(f"{campo} = %s")
+            valores.append(valor)
+
+    if not campos:
+        raise HTTPException(status_code=400, detail="No se proporcionaron campos para actualizar")
+
+    valores.append(user_id)  # Para el WHERE
+
     try:
         conn = get_connection()
         cur = conn.cursor()
-        cur.execute(
-            """
-            UPDATE usuarios
-            SET comuna = %s,
-                region = %s,
-                telefono = %s
-            WHERE google_id = %s
-            """,
-            (data.comuna, data.region, data.telefono, user_id)
-        )
+        query = f"UPDATE usuarios SET {', '.join(campos)} WHERE google_id = %s"
+        cur.execute(query, tuple(valores))
         conn.commit()
         cur.close()
         conn.close()
     except Exception as e:
         print("Error actualizando usuario:", e)
         raise HTTPException(status_code=500, detail="Error interno actualizando usuario")
-    
+
     return {"ok": True, "message": "Perfil actualizado"}
+
 
 # =========================================
 # RUTAS DE SUBIDA DE FOTOS
@@ -248,13 +254,12 @@ def upload_profile_photo(file: UploadFile = File(...), access_token: str = Cooki
 # =========================================
 
 def get_user_data(user_id: str):
-    """Función helper para obtener los datos del usuario desde la DB"""
     try:
         conn = get_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(
             """
-            SELECT foto_perfil, region, comuna, telefono
+            SELECT foto_perfil, region, comuna, telefono, edad, deporte_favorito, descripcion
             FROM usuarios
             WHERE google_id = %s
             """,
@@ -267,6 +272,7 @@ def get_user_data(user_id: str):
     except Exception as e:
         print("Error obteniendo datos del usuario:", e)
         raise HTTPException(status_code=500, detail="Error interno obteniendo perfil")
+
 
 def verify_token(access_token: str):
     """Decodifica el JWT y devuelve el google_id"""
@@ -311,6 +317,48 @@ def get_telefono(access_token: str = Cookie(None)):
     if not data:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return {"telefono": data["telefono"]}
+
+@app.get("/profile/foto")
+def get_foto(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"foto_perfil": data.get("foto_perfil")}
+
+@app.get("/profile/region")
+def get_region(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"region": data.get("region")}
+
+@app.get("/profile/comuna")
+def get_comuna(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"comuna": data.get("comuna")}
+
+@app.get("/profile/telefono")
+def get_telefono(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"telefono": data.get("telefono")}
+
+@app.get("/profile/edad")
+def get_edad(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"edad": data.get("edad")}
+
+@app.get("/profile/deporte")
+def get_deporte(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"deporte_favorito": data.get("deporte_favorito")}
+
+@app.get("/profile/descripcion")
+def get_descripcion(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    return {"descripcion": data.get("descripcion")}
 
 
 # =========================================
