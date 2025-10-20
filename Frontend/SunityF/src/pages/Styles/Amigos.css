@@ -1,0 +1,258 @@
+/* Menu de secciones */
+.amigos-menu {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  border-radius: 12px 12px 0 0;
+  padding: 8px;
+  gap: 4px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.amigos-menu button {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.amigos-menu button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #f3f4f6;
+}
+
+.amigos-menu button.active-tab {
+  background: white;
+  color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.amigos-menu button.active-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white;
+}
+
+/* Contenedor principal del contenido */
+.amigos-contenido {
+  min-height: 300px;
+  padding: 0 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estados vacíos */
+.amigos-contenido > p {
+  text-align: center;
+  color: #f3f4f6;
+  font-size: 16px;
+  padding: 60px 20px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  margin: 0;
+}
+
+/* Items de amigos y solicitudes */
+.amigo-item, .solicitud-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.amigo-item:hover, .solicitud-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #6366f1;
+  transform: translateY(-2px);
+}
+
+/* Avatar de amigos */
+.amigo-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e2e8f0;
+  margin-right: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.amigo-item:hover .amigo-avatar {
+  border-color: #6366f1;
+}
+
+/* Texto de los items */
+.amigo-item span, .solicitud-item span {
+  flex: 1;
+  font-weight: 500;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+/* Botones generales */
+.amigo-item button, .solicitud-item button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+  min-width: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Botón Ver Perfil */
+.amigo-item button {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+}
+
+.amigo-item button:hover {
+  background: #4f46e5;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Botones de solicitudes - Aceptar */
+.solicitud-item button:first-of-type:not(:only-child) {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+}
+
+.solicitud-item button:first-of-type:not(:only-child):hover {
+  background: #4f46e5;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Botones de solicitudes - Rechazar */
+.solicitud-item button:last-of-type:not(:only-child) {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+}
+
+.solicitud-item button:last-of-type:not(:only-child):hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Botón Cancelar (solicitudes enviadas) */
+.solicitud-item button:only-child {
+  background: #64748b;
+  color: white;
+  box-shadow: 0 2px 6px rgba(100, 116, 139, 0.2);
+}
+
+.solicitud-item button:only-child:hover {
+  background: #475569;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+/* Efectos de carga y estados */
+.amigo-item:active, .solicitud-item:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .amigos-menu {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .amigos-menu button.active-tab::after {
+    display: none;
+  }
+  
+  .amigo-item, .solicitud-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 20px;
+  }
+  
+  .amigo-item span, .solicitud-item span {
+    margin: 8px 0;
+  }
+  
+  .amigo-item button, .solicitud-item button {
+    margin-left: 0;
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .amigo-avatar {
+    margin-right: 0;
+  }
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.amigo-item, .solicitud-item {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Estados de carga */
+.amigos-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+}
+/* Texto de estados vacíos de solicitudes */
+.amigos-contenido p {
+  color: black;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-left: 3px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

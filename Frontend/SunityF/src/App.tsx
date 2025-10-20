@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Principal from './pages/Principal';
 import MiPerfil from './pages/MiPerfil';
 import Informacion from './pages/Informacion';
+import VerPerfil from './pages/VerPerfil';
+import Amigos from './pages/Amigos';
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -56,6 +58,12 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/Informacion">
           <Informacion />
+        </Route>
+        <Route exact path="/ver-perfil/:id">
+          <VerPerfil />
+        </Route>
+        <Route exact path="/Amigos">
+          <Amigos />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

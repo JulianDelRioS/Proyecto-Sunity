@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import './Eventos.css';
+import { useHistory } from 'react-router-dom';
+
 
 interface Evento {
   evento_id: number;
@@ -25,6 +27,8 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
   const [grupoNombre, setGrupoNombre] = useState<string>("");
   const [eventoSeleccionado, setEventoSeleccionado] = useState<Evento | null>(null);
   const [participantesEvento, setParticipantesEvento] = useState<any | null>(null);
+  const history = useHistory();
+
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
@@ -330,44 +334,51 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
       )}
 
 
-{/* Modal de participantes - Versión Mejorada */}
-{participantesEvento && (
-  <div className="evento-modal participantes-modal" onClick={() => setParticipantesEvento(null)}>
-    <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
-      <div className="modal-header">
-        <button className="btn-cerrar" onClick={() => setParticipantesEvento(null)}>×</button>
-        <h2>Participantes del Evento</h2>
-        <p className="evento-nombre">{participantesEvento.evento.nombre}</p>
-      </div>
-
-      <div className="modal-body">
-        {/* Sección Anfitrión */}
-        <div className="anfitrion-section">
-          <div className="anfitrion-header">
-            <div className="anfitrion-icon">👑</div>
-            <h3>Anfitrión del Evento</h3>
-          </div>
-          <div className="anfitrion-card">
-            <img 
-              src={participantesEvento.evento.anfitrion.foto_perfil 
-                    ? `http://localhost:8000${participantesEvento.evento.anfitrion.foto_perfil}`
-                    : "/default-profile.png"} 
-              alt={participantesEvento.evento.anfitrion.nombre} 
-              className="anfitrion-foto"
-            />
-            <div className="anfitrion-info">
-              <h4 className="anfitrion-nombre">{participantesEvento.evento.anfitrion.nombre}</h4>
-              <div className="anfitrion-contacto">
-                {participantesEvento.evento.anfitrion.email && (
-                  <span>📧 {participantesEvento.evento.anfitrion.email}</span>
-                )}
-                {participantesEvento.evento.anfitrion.telefono?.trim() && (
-                  <span>📞 {participantesEvento.evento.anfitrion.telefono}</span>
-                )}
-              </div>
+      {/* Modal de participantes - Versión Mejorada */}
+      {participantesEvento && (
+        <div className="evento-modal participantes-modal" onClick={() => setParticipantesEvento(null)}>
+          <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <button className="btn-cerrar" onClick={() => setParticipantesEvento(null)}>×</button>
+              <h2>Participantes del Evento</h2>
+              <p className="evento-nombre">{participantesEvento.evento.nombre}</p>
             </div>
-          </div>
-        </div>
+
+            <div className="modal-body">
+              {/* Sección Anfitrión */}
+              <div className="anfitrion-section">
+                <div className="anfitrion-header">
+                  <div className="anfitrion-icon">👑</div>
+                  <h3>Anfitrión del Evento</h3>
+                </div>
+                <div className="anfitrion-card">
+                  <img 
+                    src={participantesEvento.evento.anfitrion.foto_perfil 
+                          ? `http://localhost:8000${participantesEvento.evento.anfitrion.foto_perfil}`
+                          : "/default-profile.png"} 
+                    alt={participantesEvento.evento.anfitrion.nombre} 
+                    className="anfitrion-foto"
+                  />
+                  <div className="anfitrion-info">
+                    <h4 className="anfitrion-nombre">{participantesEvento.evento.anfitrion.nombre}</h4>
+                    <div className="anfitrion-contacto">
+                      {participantesEvento.evento.anfitrion.email && (
+                        <span>📧 {participantesEvento.evento.anfitrion.email}</span>
+                      )}
+                      {participantesEvento.evento.anfitrion.telefono?.trim() && (
+                        <span>📞 {participantesEvento.evento.anfitrion.telefono}</span>
+                      )}
+                    </div>
+                    <button 
+                      className="btn-ver-perfil"
+                      onClick={() => history.push(`/ver-perfil/${participantesEvento.evento.anfitrion.id}`)}
+                    >
+                      👤 Ver perfil
+                    </button>
+
+                  </div>
+                </div>
+              </div>
 
         {/* Estadísticas */}
         <div className="participantes-stats">
@@ -410,12 +421,22 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                       {p.email && <span>📧 {p.email}</span>}
                       {p.telefono?.trim() && <span>📞 {p.telefono}</span>}
                     </div>
+
+                    {/* Botón Ver Perfil */}
+                    <button 
+                      className="btn-ver-perfil"
+                      onClick={() => history.push(`/ver-perfil/${p.id}`)}
+                    >
+                      👤 Ver perfil
+                    </button>
+
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Response, Cookie, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Response, Cookie, UploadFile, File, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from google.oauth2 import id_token as google_id_token  # type: ignore
@@ -739,3 +739,492 @@ def get_participantes_evento(evento_id: int):
     except Exception as e:
         print("Error obteniendo participantes del evento:", e)
         raise HTTPException(status_code=500, detail="Error interno obteniendo participantes del evento")
+
+
+
+@app.get("/usuarios/{user_id}")
+def get_usuario_por_id(user_id: str = Path(..., description="Google ID del usuario")):
+    """
+    Obtiene los datos completos de un usuario dado su user_id (google_id),
+    incluyendo nombre, email y fecha de registro, pero excluyendo el teléfono.
+    """
+    try:
+        # Traemos todos los campos necesarios
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            """
+            SELECT nombre, email, foto_perfil, region, comuna, edad, deporte_favorito, descripcion, fecha_registro
+            FROM usuarios
+            WHERE google_id = %s
+            """,
+            (user_id,)
+        )
+        data = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if not data:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+        # Formateamos la respuesta sin el teléfono
+        respuesta = {
+            "nombre": data.get("nombre"),
+            "email": data.get("email"),
+            "foto_perfil": data.get("foto_perfil"),
+            "region": data.get("region"),
+            "comuna": data.get("comuna"),
+            "edad": data.get("edad"),
+            "deporte_favorito": data.get("deporte_favorito"),
+            "descripcion": data.get("descripcion"),
+            "fecha_registro": data.get("fecha_registro")
+        }
+
+        return {"ok": True, "user": respuesta}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error obteniendo usuario por ID:", e)
+        raise HTTPException(status_code=500, detail="Error interno obteniendo usuario")
+
+
+
+
+class SolicitudAmistadCrear(BaseModel):
+    destinatario_id: str
+
+class SolicitudAmistadResponder(BaseModel):
+    estado: str  # "aceptada" o "rechazada"
+
+
+
+# =========================================
+# ENPOINTS AMISTADES
+# =========================================
+
+@app.post("/amistad/solicitar")
+def enviar_solicitud(solicitud: SolicitudAmistadCrear, access_token: str = Cookie(None)):
+    solicitante_id = verify_token(access_token)
+    destinatario_id = solicitud.destinatario_id
+
+    if solicitante_id == destinatario_id:
+        raise HTTPException(status_code=400, detail="No puedes enviarte solicitud a ti mismo")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Verificar si ya existe la amistad
+        cur.execute(
+            """
+            SELECT 1 FROM amigos
+            WHERE (usuario_id = %s AND amigo_id = %s)
+               OR (usuario_id = %s AND amigo_id = %s)
+            """,
+            (solicitante_id, destinatario_id, destinatario_id, solicitante_id)
+        )
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Ya son amigos")
+
+        # Verificar si ya existe una solicitud pendiente
+        cur.execute(
+            """
+            SELECT 1 FROM solicitudes_amistad
+            WHERE (solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente')
+               OR (solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente')
+            """,
+            (solicitante_id, destinatario_id, destinatario_id, solicitante_id)
+        )
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Ya existe una solicitud pendiente")
+
+        # Insertar la solicitud
+        cur.execute(
+            """
+            INSERT INTO solicitudes_amistad (solicitante_id, destinatario_id)
+            VALUES (%s, %s)
+            """,
+            (solicitante_id, destinatario_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error enviando solicitud:", e)
+        raise HTTPException(status_code=500, detail="Error interno enviando solicitud")
+
+    return {"ok": True, "message": "Solicitud enviada"}
+
+
+@app.post("/amistad/responder/{solicitud_id}")
+def responder_solicitud(solicitud_id: int, respuesta: SolicitudAmistadResponder, access_token: str = Cookie(None)):
+    usuario_id = verify_token(access_token)
+    estado = respuesta.estado.lower()
+    if estado not in ["aceptada", "rechazada"]:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Verificar que la solicitud existe y es para este usuario
+        cur.execute(
+            "SELECT solicitante_id, destinatario_id FROM solicitudes_amistad WHERE id = %s",
+            (solicitud_id,)
+        )
+        solicitud = cur.fetchone()
+        if not solicitud:
+            raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+        if solicitud["destinatario_id"] != usuario_id:
+            raise HTTPException(status_code=403, detail="No puedes responder esta solicitud")
+
+        if estado == "aceptada":
+            # Crear amistad
+            cur.execute(
+                """
+                INSERT INTO amigos (usuario_id, amigo_id)
+                VALUES (%s, %s)
+                ON CONFLICT DO NOTHING
+                """,
+                (usuario_id, solicitud["solicitante_id"])
+            )
+            # Actualizar estado de la solicitud (opcional, puede quedarse para historial)
+            cur.execute(
+                """
+                UPDATE solicitudes_amistad
+                SET estado = %s, fecha_respuesta = CURRENT_TIMESTAMP
+                WHERE id = %s
+                """,
+                (estado, solicitud_id)
+            )
+        else:  # estado == "rechazada"
+            # Borrar la solicitud directamente
+            cur.execute(
+                "DELETE FROM solicitudes_amistad WHERE id = %s",
+                (solicitud_id,)
+            )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error respondiendo solicitud:", e)
+        raise HTTPException(status_code=500, detail="Error interno respondiendo solicitud")
+
+    return {"ok": True, "message": f"Solicitud {estado}"}
+
+
+@app.get("/amistad/solicitudes")
+def listar_solicitudes(access_token: str = Cookie(None)):
+    usuario_id = verify_token(access_token)
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            """
+            SELECT s.id,
+                   s.solicitante_id,
+                   s.estado,
+                   s.fecha_solicitud,
+                   u.nombre AS nombre_solicitante,
+                   u.foto_perfil AS foto_solicitante
+            FROM solicitudes_amistad s
+            JOIN usuarios u ON s.solicitante_id = u.google_id
+            WHERE s.destinatario_id = %s AND s.estado = 'pendiente'
+            ORDER BY s.fecha_solicitud DESC
+            """,
+            (usuario_id,)
+        )
+        solicitudes = cur.fetchall()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error listando solicitudes:", e)
+        raise HTTPException(status_code=500, detail="Error interno listando solicitudes")
+
+    return {"ok": True, "solicitudes": solicitudes}
+
+
+
+@app.get("/amistad/lista")
+def listar_amigos(access_token: str = Cookie(None)):
+    usuario_id = verify_token(access_token)
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            """
+            SELECT u.google_id, u.nombre, u.email, u.foto_perfil
+            FROM amigos a
+            JOIN usuarios u ON (u.google_id = a.amigo_id AND a.usuario_id = %s)
+                            OR (u.google_id = a.usuario_id AND a.amigo_id = %s)
+            """,
+            (usuario_id, usuario_id)
+        )
+        amigos = cur.fetchall()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error listando amigos:", e)
+        raise HTTPException(status_code=500, detail="Error interno listando amigos")
+
+    return {"ok": True, "amigos": amigos}
+
+
+
+from fastapi import APIRouter, Cookie, HTTPException
+
+@app.delete("/amistad/eliminar/{amigo_id}")
+def eliminar_amigo(amigo_id: str, access_token: str = Cookie(None)):
+    """
+    Elimina la relación de amistad y cualquier solicitud existente entre los usuarios.
+    """
+    if not access_token:
+        raise HTTPException(status_code=401, detail="No autorizado")
+
+    try:
+        payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = payload["sub"].strip()
+    except Exception as e:
+        print("Error decodificando token:", e)
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        # Eliminar amistad
+        cur.execute(
+            """
+            DELETE FROM amigos
+            WHERE (usuario_id = %s AND amigo_id = %s)
+               OR (usuario_id = %s AND amigo_id = %s)
+            """,
+            (user_id, amigo_id, amigo_id, user_id)
+        )
+
+        # Eliminar solicitudes en ambas direcciones
+        cur.execute(
+            """
+            DELETE FROM solicitudes_amistad
+            WHERE (solicitante_id = %s AND destinatario_id = %s)
+               OR (solicitante_id = %s AND destinatario_id = %s)
+            """,
+            (user_id, amigo_id, amigo_id, user_id)
+        )
+
+        conn.commit()
+        print("Amistad y solicitudes eliminadas entre", user_id, "y", amigo_id)
+
+    except Exception as e:
+        print("❌ Error eliminando amistad o solicitudes:", e)
+        raise HTTPException(status_code=500, detail=f"Error interno: {e}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+    return {"ok": True, "message": "Amigo y solicitudes relacionadas eliminadas correctamente"}
+
+
+
+# =========================================
+# ENDPOINTS ADICIONALES AMISTAD
+# =========================================
+
+@app.get("/amistad/estado/{otro_id}")
+def obtener_estado_amistad(otro_id: str, access_token: str = Cookie(None)):
+    """
+    Devuelve el estado de la relación entre el usuario actual y otro usuario:
+    - 'amigos'
+    - 'solicitud_enviada'
+    - 'solicitud_recibida'
+    - 'ninguno'
+    """
+    usuario_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Verificar si son amigos
+        cur.execute(
+            """
+            SELECT 1 FROM amigos
+            WHERE (usuario_id = %s AND amigo_id = %s)
+               OR (usuario_id = %s AND amigo_id = %s)
+            """,
+            (usuario_id, otro_id, otro_id, usuario_id)
+        )
+        if cur.fetchone():
+            return {"estado": "amigos"}
+
+        # Verificar si hay solicitud enviada por mí
+        cur.execute(
+            """
+            SELECT 1 FROM solicitudes_amistad
+            WHERE solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente'
+            """,
+            (usuario_id, otro_id)
+        )
+        if cur.fetchone():
+            return {"estado": "solicitud_enviada"}
+
+        # Verificar si hay solicitud recibida
+        cur.execute(
+            """
+            SELECT 1 FROM solicitudes_amistad
+            WHERE solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente'
+            """,
+            (otro_id, usuario_id)
+        )
+        if cur.fetchone():
+            return {"estado": "solicitud_recibida"}
+
+        return {"estado": "ninguno"}
+
+    except Exception as e:
+        print("Error obteniendo estado de amistad:", e)
+        raise HTTPException(status_code=500, detail="Error interno")
+    finally:
+        cur.close()
+        conn.close()
+
+
+@app.delete("/amistad/cancelar/{otro_id}")
+def cancelar_solicitud_enviada(otro_id: str, access_token: str = Cookie(None)):
+    """
+    Cancela una solicitud de amistad pendiente enviada por el usuario actual.
+    """
+    usuario_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+            DELETE FROM solicitudes_amistad
+            WHERE solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente'
+            """,
+            (usuario_id, otro_id)
+        )
+        conn.commit()
+        return {"ok": True, "message": "Solicitud cancelada"}
+
+    except Exception as e:
+        print("Error cancelando solicitud:", e)
+        raise HTTPException(status_code=500, detail="Error interno")
+    finally:
+        cur.close()
+        conn.close()
+
+
+
+@app.post("/amistad/aceptar/{usuario_id}")
+def aceptar_solicitud(usuario_id: str, access_token: str = Cookie(None)):
+    """
+    Acepta la solicitud de amistad enviada por el usuario especificado.
+    """
+    if not access_token:
+        raise HTTPException(status_code=401, detail="No autorizado")
+
+    try:
+        payload = jwt.decode(access_token, JWT_SECRET, algorithms=[JWT_ALG])
+        user_id = payload["sub"].strip()
+    except Exception:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Buscar solicitud pendiente del otro usuario hacia mí
+        cur.execute(
+            """
+            SELECT id FROM solicitudes_amistad
+            WHERE solicitante_id = %s AND destinatario_id = %s AND estado = 'pendiente'
+            """,
+            (usuario_id, user_id)
+        )
+        solicitud = cur.fetchone()
+        if not solicitud:
+            raise HTTPException(status_code=404, detail="No hay solicitud pendiente de este usuario")
+
+        # Actualizar solicitud a aceptada
+        cur.execute(
+            """
+            UPDATE solicitudes_amistad
+            SET estado = 'aceptada', fecha_respuesta = CURRENT_TIMESTAMP
+            WHERE id = %s
+            """,
+            (solicitud['id'],)
+        )
+
+        # Crear amistad
+        cur.execute(
+            """
+            INSERT INTO amigos (usuario_id, amigo_id)
+            VALUES (%s, %s)
+            ON CONFLICT DO NOTHING
+            """,
+            (user_id, usuario_id)
+        )
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error aceptando solicitud:", e)
+        raise HTTPException(status_code=500, detail="Error interno aceptando solicitud")
+
+    return {"ok": True, "message": "Solicitud aceptada"}
+
+
+
+@app.get("/amistad/enviadas")
+def listar_solicitudes_enviadas(access_token: str = Cookie(None)):
+    usuario_id = verify_token(access_token)
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            """
+            SELECT s.id,
+                   s.destinatario_id,
+                   s.estado,
+                   s.fecha_solicitud,
+                   u.nombre AS nombre_destinatario,
+                   u.foto_perfil AS foto_destinatario
+            FROM solicitudes_amistad s
+            JOIN usuarios u ON s.destinatario_id = u.google_id
+            WHERE s.solicitante_id = %s AND s.estado = 'pendiente'
+            ORDER BY s.fecha_solicitud DESC
+            """,
+            (usuario_id,)
+        )
+        solicitudes = cur.fetchall()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error listando solicitudes enviadas:", e)
+        raise HTTPException(status_code=500, detail="Error interno listando solicitudes enviadas")
+
+    return {"ok": True, "solicitudes": solicitudes}
