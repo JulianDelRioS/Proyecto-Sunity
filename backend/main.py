@@ -50,6 +50,8 @@ class UpdateProfile(BaseModel):
     edad: Optional[int] = None
     deporte_favorito: Optional[str] = None
     descripcion: Optional[str] = None
+    universidad_o_instituto: Optional[str] = None  # <-- agregado
+    carrera: Optional[str] = None                  # <-- agregado
 
 
 # =========================================
@@ -161,7 +163,7 @@ def update_profile(data: UpdateProfile, access_token: str = Cookie(None)):
     # Construir dinámicamente los campos a actualizar
     campos = []
     valores = []
-    for campo in ["comuna", "region", "telefono", "edad", "deporte_favorito", "descripcion"]:
+    for campo in ["comuna", "region", "telefono", "edad", "deporte_favorito", "descripcion","universidad_o_instituto", "carrera"]:
         valor = getattr(data, campo)
         if valor is not None:
             campos.append(f"{campo} = %s")
@@ -259,7 +261,7 @@ def get_user_data(user_id: str):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(
             """
-            SELECT foto_perfil, region, comuna, telefono, edad, deporte_favorito, descripcion
+            SELECT foto_perfil, region, comuna, telefono, edad, deporte_favorito, descripcion, universidad_o_instituto, carrera
             FROM usuarios
             WHERE google_id = %s
             """,
@@ -360,6 +362,22 @@ def get_descripcion(access_token: str = Cookie(None)):
     data = get_user_data(user_id)
     return {"descripcion": data.get("descripcion")}
 
+@app.get("/profile/universidad")
+def get_universidad(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    if not data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {"universidad_o_instituto": data.get("universidad_o_instituto")}
+
+@app.get("/profile/carrera")
+def get_carrera(access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    data = get_user_data(user_id)
+    if not data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {"carrera": data.get("carrera")}
+
 
 # =========================================
 # RUTA GRUPOS
@@ -395,6 +413,7 @@ class EventoCrear(BaseModel):
     longitud: float
     max_participantes: int
     precio: int
+    
 
 
 
@@ -755,7 +774,7 @@ def get_usuario_por_id(user_id: str = Path(..., description="Google ID del usuar
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(
             """
-            SELECT nombre, email, foto_perfil, region, comuna, edad, deporte_favorito, descripcion, fecha_registro
+            SELECT nombre, email, foto_perfil, region, comuna, edad, deporte_favorito, descripcion, fecha_registro, universidad_o_instituto, carrera
             FROM usuarios
             WHERE google_id = %s
             """,
@@ -778,7 +797,10 @@ def get_usuario_por_id(user_id: str = Path(..., description="Google ID del usuar
             "edad": data.get("edad"),
             "deporte_favorito": data.get("deporte_favorito"),
             "descripcion": data.get("descripcion"),
-            "fecha_registro": data.get("fecha_registro")
+            "fecha_registro": data.get("fecha_registro"),
+            "universidad_o_instituto": data.get("universidad_o_instituto"),
+            "carrera": data.get("carrera")
+
         }
 
         return {"ok": True, "user": respuesta}

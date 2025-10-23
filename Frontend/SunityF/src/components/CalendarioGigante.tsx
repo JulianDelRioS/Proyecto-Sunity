@@ -328,6 +328,13 @@ const CalendarioGigante: React.FC = () => {
                           {participante.email && <span>{participante.email}</span>}
                           {participante.telefono?.trim() && <span>{participante.telefono}</span>}
                         </div>
+                              {/* Botón Ver Perfil */}
+                        <button 
+                          className="btn-ver-perfil"
+                          onClick={() => window.location.href = `/ver-perfil/${participante.id}`}
+                        >
+                          👤 Ver perfil
+                        </button>
                       </div>
                     ))}
                   </div>

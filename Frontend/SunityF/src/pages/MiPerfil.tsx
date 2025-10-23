@@ -16,6 +16,8 @@ import { personOutline, mailOutline, callOutline, locationOutline, saveOutline, 
 import './Styles/Home.css';
 import './Styles/Principal.css';
 import './Styles/MiPerfil.css';
+import universidadesJson from '../components/Universidades.json';
+import carrerasJson from '../components/Carreras.json';
 
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -36,7 +38,9 @@ const MiPerfil: React.FC = () => {
     foto: "",
     edad: "",
     deporte_favorito: "",
-    descripcion: ""
+    descripcion: "",
+    universidad_o_instituto: "",  // NUEVO
+    carrera: ""                  // NUEVO
   });
 
   const regiones = Object.keys(regionesData);
@@ -56,6 +60,11 @@ const MiPerfil: React.FC = () => {
       default: return data[endpoint] || "";
     }
   };
+  
+  useEffect(() => {
+    setUniversidades(universidadesJson.universidades.map((u: any) => u.nombre));
+    setCarreras(carrerasJson.carreras);
+  }, []);
 
   // Cargar todos los datos al iniciar
   useEffect(() => {
@@ -70,7 +79,20 @@ const MiPerfil: React.FC = () => {
         for (const f of fields) {
           loaded[f === "deporte" ? "deporte_favorito" : f] = await fetchField(f);
         }
-        setExtraData(loaded);
+      // Universidad / Instituto
+      const universidadRes = await fetch('http://localhost:8000/profile/universidad', {
+        credentials: 'include'
+      });
+      if (universidadRes.ok) {
+        const uniData = await universidadRes.json();
+        loaded.universidad_o_instituto = uniData.universidad_o_instituto || "";
+      }
+
+      // Carrera
+      const carreraRes = await fetchField("carrera");
+      loaded.carrera = carreraRes;
+
+      setExtraData(loaded);
 
       } catch (err) {
         console.error("Error cargando perfil:", err);
@@ -84,6 +106,8 @@ const MiPerfil: React.FC = () => {
     const { name, value } = e.target;
     setExtraData({ ...extraData, [name]: value });
   };
+  const [universidades, setUniversidades] = useState<string[]>([]);
+  const [carreras, setCarreras] = useState<string[]>([]);
 
   const handlePhotoUpload = async (event: any) => {
     const file = event.target.files[0];
@@ -251,6 +275,44 @@ const MiPerfil: React.FC = () => {
                   </IonSelect>
                 </IonItem>
               </div>
+              {/* Universidad / Instituto */}
+              <div className="field-group">
+                <IonLabel className="category-label">Universidad / Instituto</IonLabel>
+                <IonItem className="field-item" lines="none">
+                  <IonSelect
+                    name="universidad_o_instituto"
+                    value={extraData.universidad_o_instituto}
+                    placeholder="Selecciona tu universidad o instituto"
+                    onIonChange={handleChange}
+                    className="field-select"
+                    interface="action-sheet"
+                  >
+                    {universidades.map((uni) => (
+                      <IonSelectOption key={uni} value={uni}>{uni}</IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              </div>
+
+              {/* Carrera */}
+              <div className="field-group">
+                <IonLabel className="category-label">Carrera</IonLabel>
+                <IonItem className="field-item" lines="none">
+                  <IonSelect
+                    name="carrera"
+                    value={extraData.carrera}
+                    placeholder="Selecciona tu carrera"
+                    onIonChange={handleChange}
+                    className="field-select"
+                    interface="action-sheet"
+                  >
+                    {carreras.map((c) => (
+                      <IonSelectOption key={c} value={c}>{c}</IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              </div>
+
 
             </div>
 

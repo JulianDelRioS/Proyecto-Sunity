@@ -1,0 +1,32 @@
+{
+  "universidades": [
+    {"nombre": "Universidad de Chile"},
+    {"nombre": "Universidad de Santiago de Chile"},
+    {"nombre": "Universidad de Valparaíso"},
+    {"nombre": "Universidad de Concepción"},
+    {"nombre": "Universidad Técnica Federico Santa María"},
+    {"nombre": "Pontificia Universidad Católica de Chile"},
+    {"nombre": "Pontificia Universidad Católica de Valparaíso"},
+    {"nombre": "Universidad Andrés Bello"},
+    {"nombre": "Universidad del Desarrollo"},
+    {"nombre": "Universidad de los Andes"},
+    {"nombre": "Universidad Adolfo Ibáñez"},
+    {"nombre": "Universidad Diego Portales"},
+    {"nombre": "Universidad Alberto Hurtado"},
+    {"nombre": "Universidad Finis Terrae"},
+    {"nombre": "Universidad Católica del Norte"},
+    {"nombre": "Universidad Austral de Chile"},
+    {"nombre": "Universidad de Talca"},
+    {"nombre": "Universidad Viña del Mar"},
+    {"nombre": "Universidad de La Frontera"},
+    {"nombre": "Universidad de Antofagasta"},
+    {"nombre": "Universidad de Magallanes"},
+    {"nombre": "Universidad Católica del Maule"},
+    {"nombre": "Universidad Católica de Temuco"},
+    {"nombre": "Universidad San Sebastián"},
+    {"nombre": "Universidad Central de Chile"},
+    {"nombre": "Universidad Tecnológica de Chile INACAP"},
+    {"nombre": "Duoc UC"},
+    {"nombre": "AIEP"}
+  ]
+}

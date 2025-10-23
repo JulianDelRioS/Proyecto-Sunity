@@ -26,6 +26,8 @@ CREATE TABLE usuarios (
     deporte_favorito VARCHAR(50),
     edad INTEGER,
     descripcion TEXT,    
+    universidad_o_instituto VARCHAR(150),  -- Universidad o Instituto profesional
+    carrera VARCHAR(100),                   -- Carrera que estudia o estudió
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

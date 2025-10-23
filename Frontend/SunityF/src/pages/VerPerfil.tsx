@@ -21,6 +21,8 @@ interface Usuario {
   deporte_favorito?: string;
   descripcion?: string;
   fecha_registro?: string;
+  universidad_o_instituto?: string;
+  carrera?: string;
 }
 
 const VerPerfil: React.FC = () => {
@@ -217,7 +219,33 @@ const VerPerfil: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {otroUsuario.universidad_o_instituto && (
+                    <div className="info-item-verperfil">
+                      <div className="info-label-verperfil">
+                        <span className="info-icon-verperfil">🎓</span>
+                        Universidad / Instituto
+                      </div>
+                      <div className="info-value-verperfil">
+                        {otroUsuario.universidad_o_instituto}
+                      </div>
+                    </div>
+                  )}
+
+                  {otroUsuario.carrera && (
+                    <div className="info-item-verperfil">
+                      <div className="info-label-verperfil">
+                        <span className="info-icon-verperfil">📚</span>
+                        Carrera
+                      </div>
+                      <div className="info-value-verperfil">
+                        {otroUsuario.carrera}
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                
 
                 {/* Botones de acción */}
                 <div className="action-buttons-verperfil">
