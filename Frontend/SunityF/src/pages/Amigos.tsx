@@ -1,4 +1,4 @@
-import { IonContent, IonPage, IonButton } from '@ionic/react';
+import { IonContent, IonPage } from '@ionic/react';
 import './Styles/Home.css';
 import './Styles/Principal.css';
 import './Styles/Amigos.css';
@@ -6,6 +6,7 @@ import Logo from "../components/Imagenes/logo.png";
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getProfile } from '../components/funciones';
+import Chat from '../components/chat'; // <-- Importamos el componente Chat
 
 interface Usuario {
   google_id: string;
@@ -30,7 +31,7 @@ const Amigos: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState<any>(null);
 
-  const [seccion, setSeccion] = useState<'amigos' | 'recibidas' | 'enviadas'>('amigos');
+  const [seccion, setSeccion] = useState<'amigos' | 'recibidas' | 'enviadas' | 'chat'>('amigos');
 
   const [listaAmigos, setListaAmigos] = useState<Usuario[]>([]);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState<Solicitud[]>([]);
@@ -65,7 +66,7 @@ const Amigos: React.FC = () => {
       const dataRecibidas = await resRecibidas.json();
       if (resRecibidas.ok) setSolicitudesRecibidas(dataRecibidas.solicitudes);
 
-      // Solicitudes enviadas (ahora con endpoint que devuelve nombre/foto del destinatario)
+      // Solicitudes enviadas
       const resEnviadas = await fetch('http://localhost:8000/amistad/enviadas', {
         credentials: 'include'
       });
@@ -98,6 +99,7 @@ const Amigos: React.FC = () => {
               <button className={seccion === 'amigos' ? 'active-tab' : ''} onClick={() => setSeccion('amigos')}>Amigos</button>
               <button className={seccion === 'recibidas' ? 'active-tab' : ''} onClick={() => setSeccion('recibidas')}>Solicitudes recibidas</button>
               <button className={seccion === 'enviadas' ? 'active-tab' : ''} onClick={() => setSeccion('enviadas')}>Solicitudes enviadas</button>
+              <button className={seccion === 'chat' ? 'active-tab' : ''} onClick={() => setSeccion('chat')}>Chat de amigos</button>
             </div>
 
             {/* Contenido según sección */}
@@ -213,6 +215,11 @@ const Amigos: React.FC = () => {
                     ))
                   )}
                 </>
+              )}
+
+              {/* Chat de amigos */}
+              {seccion === 'chat' && (
+                <Chat />
               )}
 
             </div>

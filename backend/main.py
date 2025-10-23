@@ -12,6 +12,9 @@ from bd import get_connection
 from fastapi.staticfiles import StaticFiles
 import psycopg2.extras  # Necesario para RealDictCursor
 import shutil
+from chat import chat_router
+
+
 
 # =========================================
 # CARGA DE VARIABLES DE ENTORNO
@@ -53,6 +56,7 @@ class UpdateProfile(BaseModel):
     universidad_o_instituto: Optional[str] = None  # <-- agregado
     carrera: Optional[str] = None                  # <-- agregado
 
+app.include_router(chat_router)
 
 # =========================================
 # RUTAS DE AUTENTICACIÓN

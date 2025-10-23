@@ -87,3 +87,16 @@ CREATE TABLE solicitudes_amistad (
     CONSTRAINT solicitud_unica UNIQUE (solicitante_id, destinatario_id),
     CONSTRAINT no_solicitud_propia CHECK (solicitante_id <> destinatario_id)
 );
+
+
+
+CREATE TABLE mensajes_amigos (
+    id SERIAL PRIMARY KEY,
+    remitente_id VARCHAR(255) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    destinatario_id VARCHAR(255) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    mensaje TEXT NOT NULL,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_mensajes_amigos_pair 
+ON mensajes_amigos (LEAST(remitente_id, destinatario_id), GREATEST(remitente_id, destinatario_id));
