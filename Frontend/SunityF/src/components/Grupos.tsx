@@ -20,10 +20,10 @@ const Grupos: React.FC<GruposProps> = ({ onVerEventos }) => {
   const deporteEmojis: Record<string, string> = {
     "Fútbol": "⚽",
     "Básquetbol": "🏀",
-    "Running": "🏃‍♂️",
-    "Padel": "🎾",
+    "Running": "👟",
+    "Padel": "🥎",
     "Voleibol": "🏐",
-    "Tenis": "🎾",
+    "Tenis": "🥎",
   };
 
   useEffect(() => {

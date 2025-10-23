@@ -33,6 +33,14 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
   });
+  const grupoEmojisId: Record<number, string> = {
+    1: "🏀",
+    2: "⚽",
+    3: "🥎",
+    4: "👟",
+    5: "🥎",
+    6: "🏐",
+  };
 
   useEffect(() => {
     if (!grupoId) {
@@ -311,15 +319,22 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
                   <h4>Ubicación del Evento</h4>
                 </div>
                 <div className="mapa-content">
-                  {isLoaded && (
-                    <GoogleMap
-                      mapContainerStyle={{ width: '100%', height: '100%' }}
-                      center={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
-                      zoom={15}
-                    >
-                      <Marker position={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }} />
-                    </GoogleMap>
-                  )}
+                {isLoaded && (
+                  <GoogleMap
+                    mapContainerStyle={{ width: '100%', height: '100%' }}
+                    center={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
+                    zoom={15}
+                  >
+                    <Marker
+                      position={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
+                      label={{
+                        text: grupoEmojisId[grupoId!] || "🏃‍♂️",
+                        fontSize: "40px",
+                      }}
+                    />
+                  </GoogleMap>
+                )}
+
                 </div>
               </div>
 

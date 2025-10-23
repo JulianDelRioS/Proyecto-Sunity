@@ -642,6 +642,7 @@ def get_mis_eventos(access_token: str = Cookie(None)):
                 e.max_participantes,
                 e.latitud,
                 e.longitud,
+                e.grupo_id,
                 CASE
                     WHEN e.anfitrion_id = %s THEN 'anfitrion'
                     ELSE 'participante'

@@ -18,6 +18,7 @@ interface Evento {
   longitud?: number;
   precio?: number;
   participantes?: string; // Ej: "3 / 10"
+  grupo_id?: number;
 }
 
 interface Participante {
@@ -37,6 +38,15 @@ const CalendarioGigante: React.FC = () => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
   });
+
+  const grupoEmojisId: Record<number, string> = {
+    1: "🏀",
+    2: "⚽",
+    3: "🥎",
+    4: "👟",
+    5: "🥎",
+    6: "🏐",
+  };
 
   useEffect(() => {
     const fetchEventos = async () => {
@@ -58,6 +68,7 @@ const CalendarioGigante: React.FC = () => {
             longitud: e.longitud ?? 0,
             precio: e.precio ?? 0,
             participantes: `${e.inscritos ?? 0} / ${e.max_participantes ?? 0}`,
+            grupo_id: e.grupo_id ?? 0,
           }));
           setEventos(eventosFormateados);
         } else {
@@ -323,7 +334,6 @@ const CalendarioGigante: React.FC = () => {
                 </div>
               )}
 
-
               {/* Mapa de Google Maps */}
               {eventoSeleccionado.latitud && eventoSeleccionado.longitud && (
                 <div className="modal-mapa-container">
@@ -352,9 +362,10 @@ const CalendarioGigante: React.FC = () => {
                         }}
                       >
                         <Marker
-                          position={{ 
-                            lat: eventoSeleccionado.latitud, 
-                            lng: eventoSeleccionado.longitud 
+                          position={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
+                          label={{
+                            text: grupoEmojisId[Number(eventoSeleccionado.grupo_id)] ?? "🏃‍♂️",
+                            fontSize: "40px",
                           }}
                         />
                       </GoogleMap>
