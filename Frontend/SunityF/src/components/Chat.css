@@ -1,122 +1,81 @@
 /* Chat.css */
-:root {
-  --primary-gradient: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-  --primary-color: #5a6fd8;
-  --secondary-color: #6a4190;
-  --text-light: #ffffff;
-  --text-dark: #333333;
-  --bg-light: #f8f9fa;
-  --bg-dark: #2d3748;
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --border-radius: 12px;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-#chat-content {
-  font-family: 'Poppins', sans-serif;
-  background: var(--primary-gradient);
-  min-height: 100vh;
-}
-
 .chat-container {
   display: flex;
-  height: 100vh;
-  max-width: 1400px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow);
-  border-radius: 0;
+  height: 80vh;
+  max-height: 800px;
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 16px;
+  border: 1px solid rgba(90, 111, 216, 0.1);
 }
 
 /* Lista de amigos */
 .chat-amigos {
-  width: 350px;
-  background: white;
+  width: 320px;
+  min-width: 280px;
   border-right: 1px solid rgba(90, 111, 216, 0.1);
+  background: white;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .chat-amigos h2 {
-  background: var(--primary-gradient);
-  color: var(--text-light);
   margin: 0;
-  padding: 20px;
+  padding: 20px 16px;
+  font-size: 1.5rem;
   font-weight: 600;
-  font-size: 1.3rem;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  border-bottom: 1px solid rgba(90, 111, 216, 0.1);
 }
 
 .chat-amigos ion-list {
   flex: 1;
-  padding: 0;
+  overflow-y: auto;
+  padding: 8px;
   background: transparent;
 }
 
 .chat-amigos ion-item {
   --background: transparent;
-  --border-color: rgba(90, 111, 216, 0.1);
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --min-height: 80px;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(90, 111, 216, 0.1);
-}
-
-.chat-amigos ion-item:hover {
-  background: rgba(90, 111, 216, 0.05);
-  transform: translateX(4px);
+  --background-hover: rgba(90, 111, 216, 0.05);
+  --background-activated: linear-gradient(135deg, rgba(90, 111, 216, 0.1) 0%, rgba(106, 65, 144, 0.1) 100%);
+  --border-radius: 12px;
+  margin-bottom: 8px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  transition: all 0.2s ease;
 }
 
 .chat-amigos ion-item.activo {
-  background: linear-gradient(135deg, rgba(90, 111, 216, 0.1) 0%, rgba(106, 65, 144, 0.1) 100%);
-  border-left: 4px solid var(--primary-color);
-  position: relative;
+  --background: linear-gradient(135deg, rgba(90, 111, 216, 0.1) 0%, rgba(106, 65, 144, 0.1) 100%);
+  --color: white;
 }
 
-.chat-amigos ion-item.activo::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--primary-gradient);
-}
-
-.avatar {
-  width: 45px;
-  height: 45px;
+.chat-amigos .avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(90, 111, 216, 0.2);
   margin-right: 12px;
-  transition: all 0.3s ease;
+  border: 3px solid rgba(90, 111, 216, 0.2);
 }
 
 .chat-amigos ion-item.activo .avatar {
-  border-color: var(--primary-color);
-  transform: scale(1.05);
+  border-color: #5a6fd8;
 }
 
-.chat-amigos ion-label {
-  margin: 0;
-}
 
-.chat-amigos ion-label h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  background: none !important;
-  padding: 0 !important;
-  text-align: left !important;
-  box-shadow: none !important;
+.chat-amigos ion-item.activo ion-label {
+  --color: #5a6fd8 !important;
+  color: #5a6fd8 !important;
+}
+.chat-amigos ion-item ion-label {
+  --color: #000000 !important; /* Forzar color negro en todo momento */
+  color: #000000 !important;    /* Respaldo por si la variable no funciona */
 }
 
 /* Área de mensajes */
@@ -125,54 +84,65 @@
   display: flex;
   flex-direction: column;
   background: #f8fafc;
-  position: relative;
+  min-width: 0;
 }
 
 .chat-mensajes h2 {
-  background: white;
   margin: 0;
-  padding: 20px 30px;
+  padding: 20px 24px;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: #333333;
+  background: white;
   border-bottom: 1px solid rgba(90, 111, 216, 0.1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
+.chat-mensajes h2::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: #5a6fd8;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Lista de mensajes */
 .mensajes-list {
   flex: 1;
-  padding: 20px 30px;
   overflow-y: auto;
+  padding: 20px;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(90, 111, 216, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(106, 65, 144, 0.1) 0%, transparent 50%);
+  background-color: #5c679f; /* gris claro de base */
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(90, 111, 216, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(106, 65, 144, 0.05) 0%, transparent 50%);
+  scroll-behavior: smooth;
 }
 
-/* Estilos de mensajes individuales */
+
+/* Mensajes individuales */
 .mensaje {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   max-width: 70%;
-  animation: fadeInUp 0.3s ease;
+  animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.mensaje.recibido {
-  align-self: flex-start;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .mensaje.enviado {
@@ -180,40 +150,46 @@
   flex-direction: row-reverse;
 }
 
+.mensaje.recibido {
+  align-self: flex-start;
+}
+
 .avatar-mensaje {
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(90, 111, 216, 0.3);
   flex-shrink: 0;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .contenido-mensaje {
   background: white;
   padding: 12px 16px;
   border-radius: 18px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
-  min-width: 120px;
-}
-
-.mensaje.recibido .contenido-mensaje {
-  background: white;
-  border-bottom-left-radius: 4px;
+  word-wrap: break-word;
 }
 
 .mensaje.enviado .contenido-mensaje {
-  background: var(--primary-gradient);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
   color: white;
   border-bottom-right-radius: 4px;
 }
+
+.mensaje.recibido .contenido-mensaje {
+  background: #d1d5db; /* Gris claro */
+  color: #1f2937; /* Gris oscuro para el texto */
+  border-bottom-left-radius: 4px;
+}
+
 
 .contenido-mensaje span {
   display: block;
   margin-bottom: 4px;
   line-height: 1.4;
-  word-wrap: break-word;
 }
 
 .contenido-mensaje small {
@@ -223,23 +199,14 @@
   text-align: right;
 }
 
-.mensaje.recibido .contenido-mensaje small {
-  color: white;
-}
-
-.mensaje.enviado .contenido-mensaje small {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* Área de nuevo mensaje */
+/* Input de nuevo mensaje */
 .nuevo-mensaje {
+  padding: 20px 24px;
   background: white;
-  padding: 20px 30px;
   border-top: 1px solid rgba(90, 111, 216, 0.1);
   display: flex;
   gap: 12px;
   align-items: center;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .nuevo-mensaje ion-input {
@@ -247,211 +214,169 @@
   --padding-start: 16px;
   --padding-end: 16px;
   --background: #f8f9fa;
-  --border-radius: 25px;
+  --border-radius: 24px;
   --placeholder-color: #9ca3af;
-  --placeholder-font-style: italic;
-  min-height: 50px;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
+  --placeholder-opacity: 0.8;
+  --color: #000000; /* <- Color negro para el texto que escribes */
 }
 
 
 .nuevo-mensaje ion-button {
-  --background: var(--primary-gradient);
-  --border-radius: 25px;
+  --background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  --color: white;
+  --border-radius: 24px;
   --padding-start: 24px;
   --padding-end: 24px;
-  min-height: 50px;
+  min-width: 80px;
+  height: 48px;
   font-weight: 600;
-  text-transform: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(90, 111, 216, 0.3);
 }
 
-.nuevo-mensaje ion-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(90, 111, 216, 0.4);
+/* Estados vacíos */
+.chat-mensajes:not(:has(.nuevo-mensaje)) .mensajes-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Scrollbar personalizado */
-.mensajes-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.mensajes-list::-webkit-scrollbar-track {
-  background: rgba(90, 111, 216, 0.1);
-  border-radius: 3px;
-}
-
-.mensajes-list::-webkit-scrollbar-thumb {
-  background: var(--primary-gradient);
-  border-radius: 3px;
-}
-
-.mensajes-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #4a5fc8 0%, #5a3178 100%);
+.chat-mensajes:not(:has(.nuevo-mensaje)) .mensajes-list::before {
+  content: "👋 Selecciona un amigo para comenzar a chatear";
+  font-size: 1.1rem;
+  color: #9ca3af;
+  text-align: center;
+  padding: 40px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-container {
     flex-direction: column;
-    height: 100vh;
+    height: 90vh;
+    margin: 8px;
+    border-radius: 12px;
   }
-  
+
   .chat-amigos {
     width: 100%;
-    height: 40%;
+    height: 200px;
     border-right: none;
     border-bottom: 1px solid rgba(90, 111, 216, 0.1);
   }
-  
-  .chat-mensajes {
-    height: 60%;
+
+  .chat-amigos h2 {
+    padding: 16px;
+    font-size: 1.3rem;
   }
-  
+
+  .chat-mensajes h2 {
+    padding: 16px 20px;
+    font-size: 1.3rem;
+  }
+
+  .mensajes-list {
+    padding: 16px;
+    gap: 12px;
+  }
+
   .mensaje {
     max-width: 85%;
   }
-  
-  .chat-amigos h2,
-  .chat-mensajes h2 {
-    padding: 15px 20px;
-    font-size: 1.1rem;
-  }
-  
-  .mensajes-list {
-    padding: 15px 20px;
-  }
-  
+
   .nuevo-mensaje {
-    padding: 15px 20px;
+    padding: 16px 20px;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
-  
+
   .nuevo-mensaje ion-input {
-    min-height: 45px;
     width: 100%;
   }
-  
+
   .nuevo-mensaje ion-button {
     width: 100%;
-    min-height: 45px;
+    height: 44px;
   }
 }
 
 @media (max-width: 480px) {
+  .chat-container {
+    margin: 4px;
+    height: 95vh;
+    border-radius: 8px;
+  }
+
   .chat-amigos {
-    height: 35%;
+    height: 180px;
   }
-  
-  .chat-mensajes {
-    height: 65%;
+
+  .chat-amigos h2,
+  .chat-mensajes h2 {
+    padding: 12px 16px;
+    font-size: 1.2rem;
   }
-  
+
+  .mensajes-list {
+    padding: 12px;
+  }
+
   .mensaje {
     max-width: 90%;
   }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .avatar-mensaje {
-    width: 30px;
-    height: 30px;
-  }
-  
+
   .contenido-mensaje {
     padding: 10px 14px;
-    font-size: 0.9rem;
   }
-  
-  .chat-amigos ion-item {
-    --min-height: 70px;
-    --padding-start: 12px;
-    --padding-end: 12px;
+
+  .avatar, .avatar-mensaje {
+    width: 36px;
+    height: 36px;
+  }
+
+  .avatar-mensaje {
+    width: 28px;
+    height: 28px;
   }
 }
 
-/* Estados vacíos y loading */
-.mensajes-list:empty::before {
-  content: 'Inicia una conversación enviando un mensaje...';
-  text-align: center;
+/* Scrollbar personalizado */
+.mensajes-list::-webkit-scrollbar,
+.chat-amigos ion-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mensajes-list::-webkit-scrollbar-track,
+.chat-amigos ion-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mensajes-list::-webkit-scrollbar-thumb,
+.chat-amigos ion-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  border-radius: 3px;
+}
+
+.mensajes-list::-webkit-scrollbar-thumb:hover,
+.chat-amigos ion-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4a5fc8 0%, #5a3178 100%);
+}
+
+/* Estados de carga y vacío */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
   color: #9ca3af;
-  font-style: italic;
-  margin: auto;
-  padding: 40px 20px;
 }
 
-.chat-amigos ion-list:empty::after {
-  content: 'No tienes amigos agregados';
+.empty-state {
   text-align: center;
-  color: #9ca3af;
-  font-style: italic;
   padding: 40px 20px;
-  display: block;
+  color: #9ca3af;
 }
 
-/* Efectos de hover y transiciones */
-.chat-amigos ion-item {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.mensaje {
-  transition: transform 0.2s ease;
-}
-
-.mensaje:hover {
-  transform: translateX(2px);
-}
-
-.mensaje.enviado:hover {
-  transform: translateX(-2px);
-}
-
-/* Mejoras de accesibilidad */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Modo oscuro opcional */
-@media (prefers-color-scheme: dark) {
-  .chat-container {
-    background: rgba(45, 55, 72, 0.95);
-  }
-  
-  .chat-amigos,
-  .chat-mensajes h2,
-  .nuevo-mensaje {
-    background: var(--bg-dark);
-    color: var(--text-light);
-  }
-  
-  .mensajes-list {
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(90, 111, 216, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(106, 65, 144, 0.1) 0%, transparent 50%),
-      var(--bg-dark);
-  }
-  
-  .contenido-mensaje {
-    background: #4a5568;
-    color: white;
-  }
-  
-  .mensaje.recibido .contenido-mensaje {
-    background: #4a5568;
-  }
-  
-  .nuevo-mensaje ion-input {
-    --background: #4a5568;
-    --color: white;
-  }
+.empty-state ion-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }

@@ -43,6 +43,18 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabChange })
           <span className="nav-label">Mis horarios</span>
         </div>
       </IonButton>
+
+      {/* Nuevo botón para Chat */}
+      <IonButton 
+        className={`nav-button ${activeTab === 'chat' ? 'active' : ''}`}
+        fill="clear"
+        onClick={() => onTabChange('chat')}
+      >
+        <div className="nav-button-content">
+          <span className="nav-icon">💬</span>
+          <span className="nav-label">Chat</span>
+        </div>
+      </IonButton>
     </div>
   );
 };

@@ -10,7 +10,8 @@ import NavigationBar from '../components/NavigationBar';
 import Grupos from '../components/Grupos';
 import CrearEvento from '../components/CrearEvento';
 import CalendarioGigante from '../components/CalendarioGigante';
-import Eventos from '../components/eventos'; // nuevo componente
+import Eventos from '../components/eventos';
+import Chat from '../components/chat';
 
 const Principal: React.FC = () => {
   const history = useHistory();
@@ -66,6 +67,7 @@ const Principal: React.FC = () => {
             {activeTab === 'horarios' && <CalendarioGigante />}
 
             {activeTab === 'eventos' && <Eventos grupoId={selectedGrupoId} />}
+            {activeTab === 'chat' && <Chat />} {/* <-- Aquí se carga el componente Chat */}
           </div>
 
         </div>
