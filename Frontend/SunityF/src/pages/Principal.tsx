@@ -12,12 +12,16 @@ import CrearEvento from '../components/CrearEvento';
 import CalendarioGigante from '../components/CalendarioGigante';
 import Eventos from '../components/eventos';
 import Chat from '../components/chat';
+import ChatEvento from '../components/chatEvento'; 
 
 const Principal: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>('grupos');
   const [selectedGrupoId, setSelectedGrupoId] = useState<number | null>(null);
+
+  // Nuevo: estado para elegir tipo de chat
+  const [chatType, setChatType] = useState<'general' | 'evento'>('general');
 
   useEffect(() => {
     const checkSession = async () => {
@@ -41,13 +45,10 @@ const Principal: React.FC = () => {
 
   return (
     <IonPage>
-
-      {/* MENÚ HAMBURGUESA IMPORTADO */}
       <Hamburguesa user={user} contentId="main-content" />
 
       <IonContent id="main-content">
         <div className="home-center">
-          {/* H1 y botón de menú juntos */}
           <div className="title-menu-container">
             <h1>
               Sunity
@@ -59,24 +60,41 @@ const Principal: React.FC = () => {
           <div className="white-container">
             {activeTab === 'grupos' && 
               <Grupos onVerEventos={(grupoId) => {
-                setSelectedGrupoId(grupoId); // guardar grupo seleccionado
+                setSelectedGrupoId(grupoId);
                 handleTabChange('eventos');
               }} 
             />}
+
             {activeTab === 'Crear evento' && <CrearEvento />}
             {activeTab === 'horarios' && <CalendarioGigante />}
-
             {activeTab === 'eventos' && <Eventos grupoId={selectedGrupoId} />}
-            {activeTab === 'chat' && <Chat />} {/* <-- Aquí se carga el componente Chat */}
-          </div>
 
+            
+            {activeTab === 'chat' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '15px' }}>
+                  <IonButton
+                    fill={chatType === 'general' ? 'solid' : 'outline'}
+                    onClick={() => setChatType('general')}
+                  >
+                    Chat Amigos
+                  </IonButton>
+                  <IonButton
+                    fill={chatType === 'evento' ? 'solid' : 'outline'}
+                    onClick={() => setChatType('evento')}
+                  >
+                    Chat de eventos
+                  </IonButton>
+                </div>
+
+                {chatType === 'general' ? <Chat /> : <ChatEvento />}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Barra de navegación inferior */}
         <NavigationBar activeTab={activeTab} onTabChange={handleTabChange} />
-        
       </IonContent>
-
     </IonPage>
   );
 };

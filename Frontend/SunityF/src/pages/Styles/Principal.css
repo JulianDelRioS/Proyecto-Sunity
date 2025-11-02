@@ -7,6 +7,42 @@
   align-items: center;
   height: 100%;
 }
+/* Contenedor de los botones de chat */
+.home-center .white-container > div > div:nth-child(1) {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Estilo base de los botones */
+.home-center .white-container ion-button {
+  --border-radius: 25px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --background: #f0f0f0;
+  --color: #333;
+  --border-color: #ccc;
+  --transition: all 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* Botón activo con tu gradiente */
+.home-center .white-container ion-button[fill="solid"] {
+  --background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  --color: white;
+  --border-color: transparent;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Hover para todos los botones */
+.home-center .white-container ion-button:hover {
+  --background: #e0e0e0;
+  transform: translateY(-2px);
+}
 
 /* Contenedor blanco principal */
 .white-container {

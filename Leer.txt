@@ -100,3 +100,49 @@ CREATE TABLE mensajes_amigos (
 
 CREATE INDEX idx_mensajes_amigos_pair 
 ON mensajes_amigos (LEAST(remitente_id, destinatario_id), GREATEST(remitente_id, destinatario_id));
+
+
+
+
+
+
+
+CREATE TABLE mensajes_eventos (
+    id SERIAL PRIMARY KEY,
+    evento_id INT NOT NULL REFERENCES eventos_deportivos(id) ON DELETE CASCADE,
+    remitente_id VARCHAR(255) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    mensaje TEXT NOT NULL,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índice para acelerar las consultas por evento y fecha
+CREATE INDEX idx_mensajes_eventos_evento
+ON mensajes_eventos (evento_id, fecha_envio);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE calificaciones_usuarios (
+    id SERIAL PRIMARY KEY,
+    evaluador_id VARCHAR(255) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    evaluado_id VARCHAR(255) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+    evento_id INT REFERENCES eventos_deportivos(id) ON DELETE SET NULL,  -- opcional, si la calificación surge tras un evento
+    estrellas INT CHECK (estrellas BETWEEN 1 AND 5) NOT NULL,             -- calificación de 1 a 5 estrellas
+    comentario TEXT,                                                      -- comentario opcional del evaluador
+    fecha_calificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT no_auto_calificacion CHECK (evaluador_id <> evaluado_id),
+    CONSTRAINT calificacion_unica UNIQUE (evaluador_id, evaluado_id, evento_id)  -- evita múltiples calificaciones duplicadas
+);
