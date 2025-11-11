@@ -34,6 +34,12 @@ const VerPerfil: React.FC = () => {
   const [otroUsuario, setOtroUsuario] = useState<Usuario | null>(null);
   const [estadoAmistad, setEstadoAmistad] = useState<string>('ninguno');
   const [cargandoEstado, setCargandoEstado] = useState<boolean>(true);
+  const [promedio, setPromedio] = useState<number>(0);
+  const [cantidad, setCantidad] = useState<number>(0);
+  const [detalles, setDetalles] = useState<any[]>([]);
+  const [mostrarDetalles, setMostrarDetalles] = useState<boolean>(false);
+
+
 
   // Cargar perfil del otro usuario
   useEffect(() => {
@@ -90,6 +96,30 @@ const VerPerfil: React.FC = () => {
     };
     fetchEstado();
   }, [perfilDeOtroUsuario]);
+  // Obtener calificaciones del usuario
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchCalificaciones = async () => {
+      try {
+        // Obtener promedio y cantidad
+        const resProm = await fetch(`http://localhost:8000/calificaciones/${id}`);
+        const dataProm = await resProm.json();
+        setPromedio(dataProm.promedio_estrellas);
+        setCantidad(dataProm.cantidad_calificaciones);
+
+        // Obtener detalles de calificaciones
+        const resDet = await fetch(`http://localhost:8000/calificaciones/${id}/detalles`);
+        const dataDet = await resDet.json();
+        setDetalles(dataDet.calificaciones);
+      } catch (err) {
+        console.error("Error cargando calificaciones:", err);
+      }
+    };
+
+    fetchCalificaciones();
+  }, [id]);
+
 
   const handleSolicitud = async () => {
     if (!perfilDeOtroUsuario) return;
@@ -249,6 +279,90 @@ const VerPerfil: React.FC = () => {
                       <div className="info-value-verperfil">
                         {otroUsuario.carrera}
                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Calificaciones */}
+                <div className="info-section-verperfil">
+                  <div className="section-header-verperfil">
+                    <span className="section-icon-verperfil">⭐</span>
+                    <h3>Calificaciones</h3>
+                  </div>
+
+                  <div className="rating-summary-verperfil">
+                  {/* Mostrar estrellas visuales - VERSIÓN CORREGIDA */}
+                  <div className="rating-stars-container">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const starValue = i + 1;
+                      let starClass = "star-empty";
+                      let starChar = "☆";
+                      
+                      if (starValue <= Math.floor(promedio)) {
+                        // Estrella completamente llena
+                        starClass = "star-filled";
+                        starChar = "★";
+                      } else if (starValue - 0.5 <= promedio) {
+                        // Media estrella
+                        starClass = "star-half";
+                        starChar = "★";
+                      }
+                      // else: estrella vacía (valores por defecto)
+                      
+                      return (
+                        <span key={i} className={starClass}>
+                          {starChar}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                    <p className="rating-average-text">
+                      {promedio.toFixed(1)} de 5 ({cantidad} calificaciones)
+                    </p>
+
+                    {cantidad > 0 && (
+                      <button
+                        className="btn-detalles-calificaciones"
+                        onClick={() => setMostrarDetalles(!mostrarDetalles)}
+                      >
+                        {mostrarDetalles ? "🔽 Ocultar detalles" : "📋 Ver detalles"}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Detalles (expandibles) */}
+                  {mostrarDetalles && (
+                    <div className="rating-list-verperfil">
+                      {detalles.length > 0 ? (
+                        detalles.map((item) => (
+                          <div key={item.id} className="rating-item-verperfil">
+                            <div className="rating-header-verperfil">
+                              <img
+                                src={
+                                  item.evaluador_foto
+                                    ? `http://localhost:8000${item.evaluador_foto}`
+                                    : "/default-profile.png"
+                                }
+                                alt="Evaluador"
+                                className="rating-avatar-verperfil"
+                              />
+                              <div>
+                                <strong>{item.evaluador_nombre || "Usuario anónimo"}</strong>
+                                <p className="rating-stars-verperfil">
+                                  {"★".repeat(item.estrellas) + "☆".repeat(5 - item.estrellas)}
+                                </p>
+                              </div>
+                            </div>
+                            {item.motivo && <p className="rating-motivo-verperfil">💬 {item.motivo}</p>}
+                            <p className="rating-fecha-verperfil">
+                              {new Date(item.fecha_calificacion).toLocaleDateString("es-ES")}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="no-ratings-verperfil">Aún no tiene calificaciones.</p>
+                      )}
                     </div>
                   )}
                 </div>

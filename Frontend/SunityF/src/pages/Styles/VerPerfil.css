@@ -169,6 +169,270 @@
   font-size: 16px;
   margin: 0;
 }
+/* ===== SECCIÓN DE CALIFICACIONES - DISEÑO PROFESIONAL ===== */
+
+/* Contenedor principal de calificaciones */
+.rating-summary-verperfil {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+  border: 1px solid #e3e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+/* Contenedor de estrellas */
+.rating-stars-container {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Estilos de estrellas */
+.star-filled,
+.star-half,
+.star-empty {
+  font-size: 2.2rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.star-filled {
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.star-half {
+  position: relative;
+  color: #e4e5e9; /* Color de fondo (estrella vacía) */
+}
+
+.star-half::before {
+  content: "★";
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: #FFD700; /* Color de la parte llena */
+}
+
+.star-empty {
+  color: #e4e5e9;
+}
+
+/* Texto del promedio */
+.rating-average-text {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 12px 0;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Botón de detalles */
+.btn-detalles-calificaciones {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  margin-top: 8px;
+}
+
+.btn-detalles-calificaciones:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-detalles-calificaciones:active {
+  transform: translateY(0);
+}
+
+/* Lista de calificaciones detalladas */
+.rating-list-verperfil {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #f1f3f9;
+  display: grid;
+  gap: 16px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Item individual de calificación */
+.rating-item-verperfil {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #f0f2f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.rating-item-verperfil:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Header de cada calificación */
+.rating-header-verperfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rating-avatar-verperfil {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e9ecef;
+}
+
+.rating-header-verperfil div {
+  flex: 1;
+}
+
+.rating-header-verperfil strong {
+  color: #2d3748;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Estrellas individuales en detalles */
+.rating-stars-verperfil {
+  color: #FFD700;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+/* Motivo de la calificación */
+.rating-motivo-verperfil {
+  background: #f8f9fa;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 12px 0;
+  color: #4a5568;
+  font-style: italic;
+  border-left: 3px solid #667eea;
+  line-height: 1.5;
+}
+
+/* Fecha de la calificación */
+.rating-fecha-verperfil {
+  text-align: right;
+  color: #718096;
+  font-size: 0.85rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Mensaje cuando no hay calificaciones */
+.no-ratings-verperfil {
+  text-align: center;
+  color: #a0aec0;
+  font-style: italic;
+  padding: 40px 20px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rating-summary-verperfil {
+    padding: 20px 16px;
+    margin: 16px 0;
+  }
+  
+  .star-filled,
+  .star-half,
+  .star-empty {
+    font-size: 1.8rem;
+  }
+  
+  .rating-average-text {
+    font-size: 1.1rem;
+    padding: 6px 12px;
+  }
+  
+  .btn-detalles-calificaciones {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .rating-item-verperfil {
+    padding: 16px;
+  }
+  
+  .rating-header-verperfil {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .rating-motivo-verperfil {
+    text-align: center;
+    font-size: 0.9rem;
+  }
+}
+
+/* Efectos de animación suaves */
+.rating-stars-container span {
+  transition: transform 0.2s ease;
+}
+
+.rating-stars-container span:hover {
+  transform: scale(1.2);
+}
+
+/* Estado de carga para calificaciones */
+.rating-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.rating-loading::after {
+  content: "";
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 /* Contenedor de botones de acción */
 .action-buttons-verperfil {
   display: flex;
