@@ -1,8 +1,8 @@
-import { IonMenu, IonToolbar, IonContent, IonList, IonItem, IonIcon, IonTitle  } from '@ionic/react';
+import { IonMenu, IonToolbar, IonContent, IonList, IonItem, IonIcon, IonTitle } from '@ionic/react';
 import { logOutOutline, peopleOutline, informationCircleOutline, personOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { logout } from './funciones';
-import './Hamburguesa.css'; // Archivo CSS separado para mejor organización
+import './Hamburguesa.css';
 
 interface HamburguesaProps {
   user: any;
@@ -11,6 +11,15 @@ interface HamburguesaProps {
 
 const Hamburguesa: React.FC<HamburguesaProps> = ({ user, contentId }) => {
   const history = useHistory();
+
+const handleVerPerfil = () => {
+  if (user && user.id) {
+    history.push(`/Ver-Perfil/${user.id}?refresh=${Date.now()}`);
+  } else {
+    alert("Error: no se encontró el ID del usuario.");
+  }
+};
+
 
   return (
     <IonMenu side="end" contentId={contentId} className="hamburguesa-content">
@@ -25,7 +34,12 @@ const Hamburguesa: React.FC<HamburguesaProps> = ({ user, contentId }) => {
 
       <IonContent className="hamburguesa-content-inner">
         <IonList lines="none" className="hamburguesa-list">
-          <IonItem button onClick={() => history.push('/MiPerfil')} className="hamburguesa-item hamburguesa-profile-item" detail={false}>
+          <IonItem
+            button
+            onClick={handleVerPerfil}
+            className="hamburguesa-item hamburguesa-profile-item"
+            detail={false}
+          >
             <IonIcon icon={personOutline} slot="start" className="hamburguesa-icon hamburguesa-profile-icon" />
             <div className="hamburguesa-text"><span>Mi Perfil</span></div>
           </IonItem>

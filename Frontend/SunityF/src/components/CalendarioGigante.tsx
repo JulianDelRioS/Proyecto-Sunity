@@ -34,6 +34,7 @@ const CalendarioGigante: React.FC = () => {
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [loading, setLoading] = useState(true);
   const [participantesEvento, setParticipantesEvento] = useState<Participante[]>([]);
+  const [showConfirmar, setShowConfirmar] = useState(false);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
@@ -101,7 +102,6 @@ const CalendarioGigante: React.FC = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Error al obtener participantes");
 
-      // El anfitrión primero
       const anfitrion: Participante = {
         id: data.evento.anfitrion.id,
         nombre: data.evento.anfitrion.nombre,
@@ -146,35 +146,22 @@ const CalendarioGigante: React.FC = () => {
     }
   };
 
-  const unirseEvento = async (eventoId: string) => {
+  const manejarSalidaEvento = async (eventoId: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/eventos/${eventoId}/unirse`, {
-        method: 'POST',
-        credentials: 'include',
+      const res = await fetch(`http://localhost:8000/eventos/${eventoId}/salir`, {
+        method: "POST",
+        credentials: "include",
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Error al unirse al evento");
+      if (!res.ok) throw new Error(data.detail || "Error al procesar la acción");
 
       alert(data.message);
 
-      setEventoSeleccionado((prev) =>
-        prev
-          ? { 
-              ...prev, 
-              participantes: `${data.participantes_actuales} / ${data.max_participantes}` 
-            }
-          : prev
-      );
-      setEventos((prev) =>
-        prev.map((e) =>
-          e.id === eventoId
-            ? { 
-                ...e, 
-                participantes: `${data.participantes_actuales} / ${data.max_participantes}` 
-              }
-            : e
-        )
-      );
+      // Quitar evento del calendario
+      setEventos((prev) => prev.filter((e) => e.id !== eventoId));
+      setEventoSeleccionado(null);
+      setShowConfirmar(false);
     } catch (err: any) {
       alert(err.message);
     }
@@ -328,7 +315,7 @@ const CalendarioGigante: React.FC = () => {
                           {participante.email && <span>{participante.email}</span>}
                           {participante.telefono?.trim() && <span>{participante.telefono}</span>}
                         </div>
-                              {/* Botón Ver Perfil */}
+
                         <button 
                           className="btn-ver-perfil"
                           onClick={() => window.location.href = `/ver-perfil/${participante.id}`}
@@ -341,7 +328,7 @@ const CalendarioGigante: React.FC = () => {
                 </div>
               )}
 
-              {/* Mapa de Google Maps */}
+              {/* Mapa */}
               {eventoSeleccionado.latitud && eventoSeleccionado.longitud && (
                 <div className="modal-mapa-container">
                   <div className="mapa-header">
@@ -351,16 +338,8 @@ const CalendarioGigante: React.FC = () => {
                   <div className="mapa-content">
                     {isLoaded ? (
                       <GoogleMap
-                        mapContainerStyle={{ 
-                          width: '100%', 
-                          height: '300px', 
-                          borderRadius: '8px',
-                          border: '1px solid #e0e0e0'
-                        }}
-                        center={{ 
-                          lat: eventoSeleccionado.latitud, 
-                          lng: eventoSeleccionado.longitud 
-                        }}
+                        mapContainerStyle={{ width: '100%', height: '300px', borderRadius: '8px', border: '1px solid #e0e0e0' }}
+                        center={{ lat: eventoSeleccionado.latitud, lng: eventoSeleccionado.longitud }}
                         zoom={15}
                         options={{
                           streetViewControl: false,
@@ -390,11 +369,41 @@ const CalendarioGigante: React.FC = () => {
               <div className="modal-actions">
                 <button 
                   className="btn-accion"
-                  onClick={() => { /* aún no hace nada */ }}
+                  onClick={() => setShowConfirmar(true)}
                 >
-                  ❌ Abandonar este evento
+                  ❌ {eventoSeleccionado.tipo === "anfitrion" ? "Cancelar evento" : "Abandonar este evento"}
                 </button>
               </div>
+
+              {/* Modal de confirmación */}
+              {showConfirmar && (
+                <div className="confirm-modal" onClick={() => setShowConfirmar(false)}>
+                  <div className="confirm-content" onClick={(e) => e.stopPropagation()}>
+                    <h3>
+                      {eventoSeleccionado.tipo === "anfitrion"
+                        ? "Cancelar evento"
+                        : "Abandonar evento"}
+                    </h3>
+                    <p>
+                      {eventoSeleccionado.tipo === "anfitrion"
+                        ? "¿Estás seguro de que deseas cancelar este evento? Todos los participantes serán eliminados y el evento desaparecerá del calendario, además se te calificará automaticamente con media estrella por cancelar un evento."
+                        : "¿Estás seguro de que deseas abandonar este evento? Ya no aparecerá en tu lista y se te calificará automaticamente con media estrella por abandonar este evento."}
+                    </p>
+                    <div className="confirm-buttons">
+                      <button className="btn-cancelar" onClick={() => setShowConfirmar(false)}>
+                        No, volver
+                      </button>
+                      <button
+                        className="btn-confirmar"
+                        onClick={() => manejarSalidaEvento(eventoSeleccionado.id)}
+                      >
+                        Sí, confirmar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>

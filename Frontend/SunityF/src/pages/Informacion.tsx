@@ -66,7 +66,7 @@ const Informacion: React.FC = () => {
                       <li className="feature-item">
                         <span className="feature-icon">💬</span>
                         <div className="feature-text">
-                          <strong>Conecta con la comunidad:</strong> Coordina con otros usuarios para crear experiencias deportivas memorables.
+                          <strong>Conecta con la comunidad:</strong> Con nuestro chat en tiempo real, coordina con otros usuarios para crear experiencias deportivas memorables.
                         </div>
                       </li>
                     </ul>

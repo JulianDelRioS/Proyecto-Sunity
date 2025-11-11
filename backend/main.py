@@ -13,6 +13,10 @@ from fastapi.staticfiles import StaticFiles
 import psycopg2.extras  # Necesario para RealDictCursor
 import shutil
 from chat import chat_router
+from calificaciones import router as calificaciones_router
+
+
+
 
 
 
@@ -57,6 +61,8 @@ class UpdateProfile(BaseModel):
     carrera: Optional[str] = None                  # <-- agregado
 
 app.include_router(chat_router)
+app.include_router(calificaciones_router)
+
 
 # =========================================
 # RUTAS DE AUTENTICACIÓN
@@ -1255,3 +1261,70 @@ def listar_solicitudes_enviadas(access_token: str = Cookie(None)):
         raise HTTPException(status_code=500, detail="Error interno listando solicitudes enviadas")
 
     return {"ok": True, "solicitudes": solicitudes}
+
+
+
+
+@app.post("/eventos/{evento_id}/salir")
+def salir_o_cancelar_evento(evento_id: int, access_token: str = Cookie(None)):
+    """
+    Permite a un usuario abandonar un evento si no es anfitrión,
+    o cancelarlo si es el anfitrión.
+    """
+    user_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Verificar si el evento existe
+        cur.execute(
+            "SELECT anfitrion_id FROM eventos_deportivos WHERE id = %s",
+            (evento_id,)
+        )
+        evento = cur.fetchone()
+
+        if not evento:
+            raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+        anfitrion_id = evento["anfitrion_id"]
+
+        if anfitrion_id == user_id:
+            #  Si el usuario es el anfitrión: cancelar el evento
+            # Eliminar primero relaciones con participantes
+            cur.execute("DELETE FROM usuarios_eventos WHERE evento_id = %s", (evento_id,))
+
+            # Si tienes mensajes de chat asociados al evento, puedes limpiarlos también:
+            # cur.execute("DELETE FROM mensajes_evento WHERE evento_id = %s", (evento_id,))
+
+            # Finalmente eliminar el evento
+            cur.execute("DELETE FROM eventos_deportivos WHERE id = %s", (evento_id,))
+
+            conn.commit()
+            mensaje = "Has cancelado el evento correctamente."
+            accion = "evento_cancelado"
+
+        else:
+            #  Si el usuario NO es anfitrión: salir del evento
+            cur.execute(
+                "DELETE FROM usuarios_eventos WHERE usuario_id = %s AND evento_id = %s",
+                (user_id, evento_id)
+            )
+
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=400, detail="No estás inscrito en este evento")
+
+            conn.commit()
+            mensaje = "Has abandonado el evento correctamente."
+            accion = "usuario_salio"
+
+        cur.close()
+        conn.close()
+
+        return {"ok": True, "message": mensaje, "accion": accion}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Error al salir/cancelar evento:", e)
+        raise HTTPException(status_code=500, detail="Error interno al procesar la solicitud")

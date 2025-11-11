@@ -207,9 +207,26 @@ const MiPerfil: React.FC = () => {
                 <IonLabel className="category-label">Teléfono</IonLabel>
                 <IonItem className="field-item" lines="none">
                   <IonIcon icon={callOutline} className="field-icon" />
-                  <IonInput name="telefono" value={extraData.telefono} onIonChange={handleChange} placeholder="Escribe tu teléfono..." className="field-input" />
+                  <IonInput
+                    name="telefono"
+                    type="tel"
+                    inputmode="numeric"
+                    maxlength={9}
+                    value={extraData.telefono}
+                    onIonInput={(e) => {
+                      const input = e.detail.value || "";
+                      // Permitir solo números y máximo 9 dígitos
+                      const numericValue = input.replace(/\D/g, "").slice(0, 9);
+                      handleChange({
+                        target: { name: "telefono", value: numericValue }
+                      } as any);
+                    }}
+                    placeholder="Escribe tu teléfono..."
+                    className="field-input"
+                  />
                 </IonItem>
               </div>
+
 
               {/* Edad */}
               <div className="field-group">

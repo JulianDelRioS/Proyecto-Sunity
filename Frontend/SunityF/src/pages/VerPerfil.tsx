@@ -37,6 +37,14 @@ const VerPerfil: React.FC = () => {
 
   // Cargar perfil del otro usuario
   useEffect(() => {
+  if (id) {
+    fetch(`http://localhost:8000/usuarios/${id}`)
+      .then(res => res.json())
+      .then(data => setOtroUsuario(data.user))
+      .catch(err => console.error(err));
+  }
+}, [id, location.search]); // 👈 se ejecuta también si cambia el parámetro
+  useEffect(() => {
     setPerfilDeOtroUsuario(id);
 
     if (id) {
@@ -256,17 +264,29 @@ const VerPerfil: React.FC = () => {
                     🔙 Volver
                   </button>
 
-                  <button
-                    className="btn-solicitud-verperfil"
-                    onClick={handleSolicitud}
-                    disabled={cargandoEstado}
-                  >
-                    {estadoAmistad === 'ninguno' && '🤝 Enviar solicitud de amistad'}
-                    {estadoAmistad === 'solicitud_enviada' && '❌ Cancelar solicitud'}
-                    {estadoAmistad === 'solicitud_recibida' && '✅ Aceptar solicitud'}
-                    {estadoAmistad === 'amigos' && '✅ Son amigos'}
-                  </button>
+                  {user && user.id.toString() === id ? (
+                    // Si el perfil es del mismo usuario logueado
+                    <button
+                      className="btn-solicitud-verperfil"
+                      onClick={() => history.push("/MiPerfil")}
+                    >
+                      ✏️ Editar mi perfil
+                    </button>
+                  ) : (
+                    // Si es otro usuario
+                    <button
+                      className="btn-solicitud-verperfil"
+                      onClick={handleSolicitud}
+                      disabled={cargandoEstado}
+                    >
+                      {estadoAmistad === 'ninguno' && '🤝 Enviar solicitud de amistad'}
+                      {estadoAmistad === 'solicitud_enviada' && '❌ Cancelar solicitud'}
+                      {estadoAmistad === 'solicitud_recibida' && '✅ Aceptar solicitud'}
+                      {estadoAmistad === 'amigos' && '✅ Son amigos'}
+                    </button>
+                  )}
                 </div>
+
 
               </div>
             ) : (
