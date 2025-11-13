@@ -6,6 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import type { EventClickArg } from "@fullcalendar/core";
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 import "./Styles/CalendarioGigante.css";
+import { getProfile } from './funciones';
 
 interface Evento {
   id: string;
@@ -35,6 +36,8 @@ const CalendarioGigante: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [participantesEvento, setParticipantesEvento] = useState<Participante[]>([]);
   const [showConfirmar, setShowConfirmar] = useState(false);
+  const [usuarioId, setUsuarioId] = useState<string | null>(null);
+
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyARn1iesZ0davsL71G7SEvuonnbR13XCZE"
@@ -146,26 +149,72 @@ const CalendarioGigante: React.FC = () => {
     }
   };
 
-  const manejarSalidaEvento = async (eventoId: string) => {
+// Obtener el ID del usuario activo al montar el componente
+useEffect(() => {
+  const fetchUserId = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/eventos/${eventoId}/salir`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Error al procesar la acción");
-
-      alert(data.message);
-
-      // Quitar evento del calendario
-      setEventos((prev) => prev.filter((e) => e.id !== eventoId));
-      setEventoSeleccionado(null);
-      setShowConfirmar(false);
-    } catch (err: any) {
-      alert(err.message);
+      const perfil = await getProfile();
+      if (perfil?.user?.id) {
+        console.log("✅ Usuario activo:", perfil.user.id);
+        setUsuarioId(perfil.user.id.toString());
+      } else {
+        console.warn("⚠️ No se encontró el ID del usuario en getProfile:", perfil);
+      }
+    } catch (error) {
+      console.error("❌ Error obteniendo perfil del usuario:", error);
     }
   };
+  fetchUserId();
+}, []);
+
+
+// Manejo de salida o cancelación de evento
+const manejarSalidaEvento = async (eventoId: string) => {
+  try {
+    const evento = eventos.find((e) => e.id === eventoId);
+    const motivo = evento?.tipo === "anfitrion" ? "cancelacion_evento" : "abandono_evento";
+
+    // Primero, salir o cancelar el evento
+    const res = await fetch(`http://localhost:8000/eventos/${eventoId}/salir`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Error al procesar la acción");
+
+    alert(data.message);
+
+    // Luego, aplicar calificación automática del sistema
+    if (usuarioId) {
+      try {
+        const calificacionRes = await fetch(
+          `http://localhost:8000/calificaciones/sistema/${usuarioId}?estrellas=1&motivo=${motivo}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        );
+
+        const calificacionData = await calificacionRes.json();
+        if (!calificacionRes.ok)
+          throw new Error(calificacionData.detail || "Error al crear la calificación del sistema");
+
+        console.log("✅ Calificación de sistema creada:", calificacionData);
+      } catch (error: any) {
+        console.error("❌ Error al calificar automáticamente:", error.message);
+      }
+    }
+
+    // Quitar evento del calendario
+    setEventos((prev) => prev.filter((e) => e.id !== eventoId));
+    setEventoSeleccionado(null);
+    setShowConfirmar(false);
+  } catch (err: any) {
+    alert(err.message);
+  }
+};
+
 
   if (loading) return (
     <div className="calendario-container">
@@ -386,8 +435,8 @@ const CalendarioGigante: React.FC = () => {
                     </h3>
                     <p>
                       {eventoSeleccionado.tipo === "anfitrion"
-                        ? "¿Estás seguro de que deseas cancelar este evento? Todos los participantes serán eliminados y el evento desaparecerá del calendario, además se te calificará automaticamente con media estrella por cancelar un evento."
-                        : "¿Estás seguro de que deseas abandonar este evento? Ya no aparecerá en tu lista y se te calificará automaticamente con media estrella por abandonar este evento."}
+                        ? "¿Estás seguro de que deseas cancelar este evento? Todos los participantes serán eliminados y el evento desaparecerá del calendario, además se te calificará automaticamente con 1 estrella por cancelar un evento."
+                        : "¿Estás seguro de que deseas abandonar este evento? Ya no aparecerá en tu lista y se te calificará automaticamente con 1 estrella por abandonar este evento."}
                     </p>
                     <div className="confirm-buttons">
                       <button className="btn-cancelar" onClick={() => setShowConfirmar(false)}>
