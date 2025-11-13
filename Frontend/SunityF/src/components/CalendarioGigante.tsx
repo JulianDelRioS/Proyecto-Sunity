@@ -5,7 +5,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { EventClickArg } from "@fullcalendar/core";
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-import "./CalendarioGigante.css";
+import "./Styles/CalendarioGigante.css";
 
 interface Evento {
   id: string;

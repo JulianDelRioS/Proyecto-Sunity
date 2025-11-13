@@ -3,17 +3,24 @@ import { IonPage, IonContent} from '@ionic/react';
 import './Styles/Informacion.css';
 import './Styles/Principal.css';
 import Logo from "../components/Imagenes/logo.png";
-
+import { useHistory } from 'react-router-dom';
 
 
 const Informacion: React.FC = () => {
+  const history = useHistory(); //  Inicializar history
   return (
     <IonPage>
       <IonContent className="ion-padding home-content">
         <div className="title-menu-container">
           <h1>
             Sunity
-            <img src={Logo} alt="Logo" className="logo-icon" />
+            <img
+              src={Logo}
+              alt="Logo"
+              className="logo-icon"
+              onClick={() => history.push("/principal")} // ✅ Redirige a Principal
+              style={{ cursor: "pointer" }} // ✅ Indicador visual de clic
+            />
           </h1>
           
         </div>

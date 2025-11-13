@@ -180,8 +180,15 @@ const VerPerfil: React.FC = () => {
           <div className="title-menu-container">
             <h1>
               Sunity
-              <img src={Logo} alt="Logo" className="logo-icon" />
+              <img
+                src={Logo}
+                alt="Logo"
+                className="logo-icon"
+                onClick={() => history.push("/principal")}
+                style={{ cursor: "pointer" }}
+              />
             </h1>
+
           </div>
           
           <div className="white-container">
@@ -338,15 +345,14 @@ const VerPerfil: React.FC = () => {
                         detalles.map((item) => (
                           <div key={item.id} className="rating-item-verperfil">
                             <div className="rating-header-verperfil">
+                            {item.evaluador_nombre !== "Sistema" && (
                               <img
-                                src={
-                                  item.evaluador_foto
-                                    ? `http://localhost:8000${item.evaluador_foto}`
-                                    : "/default-profile.png"
-                                }
+                                src={item.evaluador_foto ? `http://localhost:8000${item.evaluador_foto}` : "/default-profile.png"}
                                 alt="Evaluador"
                                 className="rating-avatar-verperfil"
                               />
+                            )}
+
                               <div>
                                 <strong>{item.evaluador_nombre || "Usuario anónimo"}</strong>
                                 <p className="rating-stars-verperfil">

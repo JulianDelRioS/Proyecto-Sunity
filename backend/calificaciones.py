@@ -79,8 +79,8 @@ def obtener_detalles_calificaciones(evaluado_id: str):
                 cu.tipo,
                 cu.motivo,
                 cu.fecha_calificacion,
-                u.nombre AS evaluador_nombre,
-                u.foto_perfil AS evaluador_foto
+                COALESCE(u.nombre, 'Sistema') AS evaluador_nombre,
+                COALESCE(u.foto_perfil, '/default-system.png') AS evaluador_foto
             FROM calificaciones_usuarios cu
             LEFT JOIN usuarios u ON cu.evaluador_id = u.google_id
             WHERE cu.evaluado_id = %s
@@ -94,7 +94,6 @@ def obtener_detalles_calificaciones(evaluado_id: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/calificaciones/{evaluado_id}")
 def crear_calificacion(
@@ -141,4 +140,46 @@ def crear_calificacion(
         raise
     except Exception as e:
         print("❌ ERROR AL CREAR CALIFICACIÓN:", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/calificaciones/sistema/{evaluado_id}")
+def calificacion_sistema(
+    evaluado_id: str,
+    estrellas: int = Query(..., ge=1, le=5, description="Número de estrellas (1-5)"),
+    motivo: str = Query(..., max_length=100, description="Motivo del castigo, ej: 'abandono_evento'")
+):
+    """
+    Crea una calificación automática por parte del sistema para un usuario.
+    """
+    try:
+        # No es necesario evaluador_id, es el sistema
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute("""
+            INSERT INTO calificaciones_usuarios (evaluador_id, evaluado_id, estrellas, motivo, tipo)
+            VALUES (NULL, %s, %s, %s, 'sistema')
+            RETURNING id;
+        """, (evaluado_id, estrellas, motivo))
+
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        if not result or "id" not in result:
+            raise HTTPException(status_code=500, detail="No se pudo crear la calificación del sistema")
+
+        return {
+            "mensaje": "Calificación de sistema creada exitosamente",
+            "calificacion_id": result["id"],
+            "evaluado_id": evaluado_id,
+            "estrellas": estrellas,
+            "motivo": motivo,
+            "tipo": "sistema"
+        }
+
+    except Exception as e:
+        print("❌ ERROR AL CREAR CALIFICACIÓN DE SISTEMA:", str(e))
         raise HTTPException(status_code=500, detail=str(e))

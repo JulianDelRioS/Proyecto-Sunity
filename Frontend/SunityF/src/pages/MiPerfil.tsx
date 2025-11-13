@@ -156,6 +156,13 @@ const MiPerfil: React.FC = () => {
       <IonContent id="main-content">
         <div className="home-center">
           <div className="perfil-container">
+          <IonButton 
+            fill="clear" 
+            onClick={() => history.push("/principal")} 
+            className="volver-button"
+          >
+            ⬅ Volver
+          </IonButton>
 
             {/* Foto de perfil */}
             <div className="photo-section">

@@ -1,7 +1,7 @@
 // CrearEvento.tsx
 import React, { useState, useCallback, useRef } from "react";
 import { GoogleMap, useLoadScript, Marker, StandaloneSearchBox } from "@react-google-maps/api";
-import './CrearEvento.css';
+import './Styles/CrearEvento.css';
 
 const libraries: ("places")[] = ["places"];
 const mapContainerStyle = { width: "100%", height: "400px" };

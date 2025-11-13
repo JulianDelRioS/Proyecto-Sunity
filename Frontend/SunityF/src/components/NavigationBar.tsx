@@ -1,7 +1,7 @@
 // components/NavigationBar.tsx
 import React from 'react';
 import { IonButton } from '@ionic/react';
-import './NavigationBar.css';
+import './Styles/NavigationBar.css';
 
 interface NavigationBarProps {
   activeTab: string;

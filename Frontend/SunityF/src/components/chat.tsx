@@ -1,7 +1,7 @@
 import { IonInput, IonButton, IonItem, IonLabel, IonList } from '@ionic/react';
 import { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import './Chat.css';
+import './Styles/Chat.css';
 import { getProfile } from '../components/funciones';
 
 interface Usuario {

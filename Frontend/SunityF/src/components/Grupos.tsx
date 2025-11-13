@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Grupos.css';
+import './Styles/Grupos.css';
 
 interface Grupo {
   id: number;

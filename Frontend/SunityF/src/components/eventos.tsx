@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-import './Eventos.css';
+import './Styles/Eventos.css';
 import { useHistory } from 'react-router-dom';
 
 

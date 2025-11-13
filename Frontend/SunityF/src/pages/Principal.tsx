@@ -50,10 +50,17 @@ const Principal: React.FC = () => {
       <IonContent id="main-content">
         <div className="home-center">
           <div className="title-menu-container">
-            <h1>
-              Sunity
-              <img src={Logo} alt="Logo" className="logo-icon" />
-            </h1>
+          <h1>
+            Sunity
+            <img 
+              src={Logo} 
+              alt="Logo" 
+              className="logo-icon" 
+              onClick={() => handleTabChange('grupos')} 
+              style={{ cursor: 'pointer' }}
+            />
+          </h1>
+
             <IonMenuButton className="custom-menu-button" />
           </div>
           

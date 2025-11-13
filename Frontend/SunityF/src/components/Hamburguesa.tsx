@@ -2,7 +2,7 @@ import { IonMenu, IonToolbar, IonContent, IonList, IonItem, IonIcon, IonTitle } 
 import { logOutOutline, peopleOutline, informationCircleOutline, personOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import { logout } from './funciones';
-import './Hamburguesa.css';
+import './Styles/Hamburguesa.css';
 
 interface HamburguesaProps {
   user: any;

@@ -88,8 +88,15 @@ const Amigos: React.FC = () => {
           <div className="title-menu-container">
             <h1>
               Sunity
-              <img src={Logo} alt="Logo" className="logo-icon" />
+              <img
+                src={Logo}
+                alt="Logo"
+                className="logo-icon"
+                onClick={() => history.push("/principal")}
+                style={{ cursor: "pointer" }}
+              />
             </h1>
+
           </div>
 
           <div className="white-container">

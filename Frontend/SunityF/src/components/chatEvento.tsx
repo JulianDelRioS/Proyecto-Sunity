@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import './chatEvento.css';
+import './Styles/chatEvento.css';
 import { getProfile } from '../components/funciones';
 
 interface Evento {

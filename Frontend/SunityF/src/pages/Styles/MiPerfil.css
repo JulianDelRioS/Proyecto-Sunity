@@ -7,6 +7,13 @@
   padding: 20px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
+.volver-button {
+  align-self: flex-start;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: WHITE;
+  text-transform: none;
+}
 
 /* --- Contenedor del perfil --- */
 .perfil-container {
