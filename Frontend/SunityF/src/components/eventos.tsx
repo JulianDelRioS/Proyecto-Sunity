@@ -42,30 +42,48 @@ const Eventos: React.FC<EventosProps> = ({ grupoId }) => {
     6: "🏐",
   };
 
-  useEffect(() => {
-    if (!grupoId) {
-      setLoading(false);
-      return;
-    }
+useEffect(() => {
+  if (!grupoId) {
+    setLoading(false);
+    return;
+  }
 
-    const fetchEventos = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(`http://localhost:8000/grupos/${grupoId}/eventos`);
-        if (!res.ok) throw new Error("Error al obtener los eventos");
-        const data = await res.json();
+  const fetchEventos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      let url = "";
+      if (grupoId === 9999) {
+        //  caso especial: sugerencias
+        url = "http://localhost:8000/eventos/recomendados";
+      } else {
+        //  grupos normales
+        url = `http://localhost:8000/grupos/${grupoId}/eventos`;
+      }
+
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Error al obtener los eventos");
+      const data = await res.json();
+
+      //  ajustar según estructura de la respuesta
+      if (grupoId === 9999) {
+        setGrupoNombre("Eventos Recomendados");
+        setEventos(data.eventos);
+      } else {
         setGrupoNombre(data.grupo_nombre);
         setEventos(data.eventos);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchEventos();
-  }, [grupoId]);
+  fetchEventos();
+}, [grupoId]);
+
 
   // Función para unirse a un evento
   const unirseEvento = async (eventoId: number) => {

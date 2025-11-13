@@ -24,6 +24,7 @@ const Grupos: React.FC<GruposProps> = ({ onVerEventos }) => {
     "Padel": "🥎",
     "Voleibol": "🏐",
     "Tenis": "🥎",
+    "Sugerencias": "💡", 
   };
 
   useEffect(() => {
@@ -33,7 +34,18 @@ const Grupos: React.FC<GruposProps> = ({ onVerEventos }) => {
         const res = await fetch("http://localhost:8000/grupos");
         if (!res.ok) throw new Error("Error al obtener los grupos");
         const data = await res.json();
-        setGrupos(data.grupos);
+
+        // Agregar "Sugerencias" como primer grupo
+        const gruposConSugerencias = [
+          {
+            id: 9999,
+            nombre: "Sugerencias",
+            descripcion: "Aquí encontrarás eventos de tu deporte favorito o amigos que participen en algún evento.",
+          },
+          ...data.grupos,
+        ];
+
+        setGrupos(gruposConSugerencias);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -44,33 +56,35 @@ const Grupos: React.FC<GruposProps> = ({ onVerEventos }) => {
     fetchGrupos();
   }, []);
 
-  if (loading) return (
-    <div className="fullscreen-loading">
-      <div className="loading-content">
-        <div className="loading-spinner"></div>
-        <h2>Cargando grupos deportivos</h2>
-        <p>Estamos preparando todo para ti...</p>
-      </div>
-    </div>
-  );
-
-  if (error) return (
-    <div className="fullscreen-error">
-      <div className="error-content">
-        <div className="error-icon">⚠️</div>
-        <h2>Error al cargar los grupos</h2>
-        <p>{error}</p>
-        <div className="error-actions">
-          <button className="btn-primary" onClick={() => window.location.reload()}>
-            Reintentar
-          </button>
-          <button className="btn-secondary" onClick={() => setError(null)}>
-            Volver atrás
-          </button>
+  if (loading)
+    return (
+      <div className="fullscreen-loading">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <h2>Cargando grupos deportivos</h2>
+          <p>Estamos preparando todo para ti...</p>
         </div>
       </div>
-    </div>
-  );
+    );
+
+  if (error)
+    return (
+      <div className="fullscreen-error">
+        <div className="error-content">
+          <div className="error-icon">⚠️</div>
+          <h2>Error al cargar los grupos</h2>
+          <p>{error}</p>
+          <div className="error-actions">
+            <button className="btn-primary" onClick={() => window.location.reload()}>
+              Reintentar
+            </button>
+            <button className="btn-secondary" onClick={() => setError(null)}>
+              Volver atrás
+            </button>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="fullscreen-container">

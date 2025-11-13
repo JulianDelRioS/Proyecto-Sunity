@@ -1328,3 +1328,97 @@ def salir_o_cancelar_evento(evento_id: int, access_token: str = Cookie(None)):
     except Exception as e:
         print("Error al salir/cancelar evento:", e)
         raise HTTPException(status_code=500, detail="Error interno al procesar la solicitud")
+
+
+@app.get("/eventos/recomendados")
+def get_eventos_amigos_y_favoritos(access_token: str = Cookie(None)):
+    """
+    Obtiene todos los eventos en los que participan mis amigos (independientemente del deporte)
+    y además los eventos que sean del deporte favorito del usuario actual.
+    """
+    user_id = verify_token(access_token)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # 1️ Obtener deporte favorito del usuario
+        cur.execute("SELECT deporte_favorito FROM usuarios WHERE google_id = %s", (user_id,))
+        row = cur.fetchone()
+        deporte_favorito = row["deporte_favorito"] if row else None
+
+        # 2 Obtener IDs de amigos desde la tabla 'amigos'
+        cur.execute(
+            """
+            SELECT 
+                CASE 
+                    WHEN usuario_id = %s THEN amigo_id
+                    ELSE usuario_id
+                END AS amigo_id
+            FROM amigos
+            WHERE usuario_id = %s OR amigo_id = %s
+            """,
+            (user_id, user_id, user_id)
+        )
+        amigos = [a["amigo_id"] for a in cur.fetchall()]
+
+        eventos_finales = []
+
+        # 3 Si tiene amigos, traer los eventos donde ellos participan
+        if amigos:
+            cur.execute(
+                """
+                SELECT DISTINCT e.*
+                FROM eventos_deportivos e
+                LEFT JOIN usuarios_eventos ue ON e.id = ue.evento_id
+                WHERE ue.usuario_id = ANY(%s) OR e.anfitrion_id = ANY(%s)
+                """,
+                (amigos, amigos)
+            )
+            eventos_amigos = cur.fetchall()
+            eventos_finales.extend(eventos_amigos)
+
+        # 4 Si tiene deporte favorito, traer eventos de ese deporte
+        if deporte_favorito:
+            cur.execute(
+                """
+                SELECT DISTINCT e.*
+                FROM eventos_deportivos e
+                JOIN grupos_deportivos g ON e.grupo_id = g.id
+                WHERE LOWER(g.nombre) LIKE LOWER(%s)
+                """,
+                (f"%{deporte_favorito}%",)
+            )
+            eventos_favoritos = cur.fetchall()
+            eventos_finales.extend(eventos_favoritos)
+
+        # 5 Eliminar duplicados por ID
+        eventos_unicos = {e["id"]: e for e in eventos_finales}.values()
+
+        cur.close()
+        conn.close()
+
+        # 6 Formatear salida
+        eventos_list = [
+            {
+                "evento_id": e["id"],
+                "nombre": e["nombre"],
+                "descripcion": e["descripcion"],
+                "lugar": e["lugar"],
+                "fecha_hora": e["fecha_hora"],
+                "precio": e["precio"],
+                "latitud": e["latitud"],
+                "longitud": e["longitud"],
+                "grupo_id": e["grupo_id"],
+                "anfitrion_id": e["anfitrion_id"],
+                "max_participantes": e["max_participantes"]
+            }
+            for e in eventos_unicos
+        ]
+
+        return {"ok": True, "eventos": eventos_list}
+
+    except Exception as e:
+        print("Error obteniendo eventos recomendados:", e)
+        raise HTTPException(status_code=500, detail="Error interno obteniendo eventos recomendados")
+
